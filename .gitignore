@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.claude/
+demand/generated/
+results/trips/
+results/logs/
+scratch/
+map/osm/full.net.xml
+*.tmp
+.impeccable/mocks/
+.impeccable/review/
+map/__pycache__/

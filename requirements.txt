@@ -1,0 +1,14 @@
+eclipse-sumo
+libsumo
+traci
+sumolib
+gymnasium
+stable-baselines3
+torch
+numpy
+pandas
+matplotlib
+fastapi
+uvicorn[standard]
+websockets
+pytest

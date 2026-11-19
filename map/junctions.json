@@ -1,0 +1,98 @@
+[
+ {
+  "id": "cluster_260190193_4110751078_4914133850",
+  "name": "Abay × Beibitshilik",
+  "code": "ABBE",
+  "x": 912.8,
+  "y": 1528.6,
+  "short": "J01"
+ },
+ {
+  "id": "260190198",
+  "name": "Abay × Auezov",
+  "code": "ABAU",
+  "x": 1128.8,
+  "y": 1581.5,
+  "short": "J02"
+ },
+ {
+  "id": "cluster_14162924842_1466679367",
+  "name": "Abay × Respublika",
+  "code": "ABRE",
+  "x": 1299.1,
+  "y": 1620.8,
+  "short": "J03"
+ },
+ {
+  "id": "cluster_264827202_4914133844_5843971990_5843971991",
+  "name": "Beibitshilik × Seifullin",
+  "code": "BESE",
+  "x": 838.4,
+  "y": 1869.7,
+  "short": "J04"
+ },
+ {
+  "id": "cluster_260191055_5843971346",
+  "name": "Auezov × Seifullin",
+  "code": "AUSE",
+  "x": 1057.8,
+  "y": 1916.5,
+  "short": "J05"
+ },
+ {
+  "id": "GS_cluster_14162924838_14163000272_1466679345_5843971997",
+  "name": "Respublika × Seifullin",
+  "code": "RESE",
+  "x": 1228.8,
+  "y": 1953.9,
+  "short": "J06"
+ },
+ {
+  "id": "cluster_277328275_4914133841",
+  "name": "Beibitshilik × Zhangeldin",
+  "code": "BEZH",
+  "x": 769.9,
+  "y": 2196.1,
+  "short": "J07"
+ },
+ {
+  "id": "260191057",
+  "name": "Auezov × Zhangeldin",
+  "code": "AUZH",
+  "x": 988.7,
+  "y": 2243.5,
+  "short": "J08"
+ },
+ {
+  "id": "cluster_14163000277_14163000278_14163000279_259997017",
+  "name": "Respublika × Zhangeldin",
+  "code": "REZH",
+  "x": 1161.0,
+  "y": 2272.9,
+  "short": "J09"
+ },
+ {
+  "id": "GS_cluster_1238541651_260035336_4914133836_4914133837",
+  "name": "Bogenbay × Beibitshilik",
+  "code": "BOBE",
+  "x": 701.2,
+  "y": 2515.4,
+  "short": "J10"
+ },
+ {
+  "id": "cluster_1238541744_260035337",
+  "name": "Bogenbay × Auezov",
+  "code": "BOAU",
+  "x": 922.2,
+  "y": 2561.4,
+  "short": "J11"
+ },
+ {
+  "id": "GS_cluster_1238541753_14163000285_259997015",
+  "name": "Bogenbay × Respublika",
+  "code": "BORE",
+  "x": 1092.0,
+  "y": 2594.5,
+  "short": "J12"
+ }
+]

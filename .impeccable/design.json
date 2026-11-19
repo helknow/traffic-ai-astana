@@ -1,0 +1,592 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-18T18:10:00Z",
+  "title": "Design System: Traffic AI",
+  "extensions": {
+    "colorMeta": {
+      "void": {
+        "role": "neutral",
+        "displayName": "Void",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "carbon": {
+        "role": "neutral",
+        "displayName": "Carbon",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "obsidian": {
+        "role": "neutral",
+        "displayName": "Obsidian",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "line-hi": {
+        "role": "neutral",
+        "displayName": "Line High",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "bone": {
+        "role": "neutral",
+        "displayName": "Bone",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "mist": {
+        "role": "neutral",
+        "displayName": "Mist",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "fog": {
+        "role": "neutral",
+        "displayName": "Fog",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "ash": {
+        "role": "neutral",
+        "displayName": "Ash",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "slate": {
+        "role": "neutral",
+        "displayName": "Slate",
+        "tonalRamp": [
+          "#08090a",
+          "#161718",
+          "#23252a",
+          "#383b3f",
+          "#62666d",
+          "#8a8f98",
+          "#d0d6e0",
+          "#ffffff"
+        ]
+      },
+      "lime": {
+        "role": "primary",
+        "displayName": "Run Lime",
+        "tonalRamp": [
+          "#444804",
+          "#757d07",
+          "#a7b20a",
+          "#d9e70e",
+          "#e7f43e",
+          "#eef773",
+          "#f5faad",
+          "#fcfee7"
+        ]
+      },
+      "lime-hover": {
+        "role": "primary",
+        "displayName": "Run Lime, hover",
+        "tonalRamp": [
+          "#444804",
+          "#757d07",
+          "#a7b20a",
+          "#d9e70e",
+          "#e7f43e",
+          "#eef773",
+          "#f5faad",
+          "#fcfee7"
+        ]
+      },
+      "lime-active": {
+        "role": "primary",
+        "displayName": "Run Lime, pressed",
+        "tonalRamp": [
+          "#444804",
+          "#757d07",
+          "#a7b20a",
+          "#d9e70e",
+          "#e7f43e",
+          "#eef773",
+          "#f5faad",
+          "#fcfee7"
+        ]
+      },
+      "iris": {
+        "role": "secondary",
+        "displayName": "Shield Iris",
+        "tonalRamp": [
+          "#060846",
+          "#0b0d7a",
+          "#1013ad",
+          "#1418e1",
+          "#4447ee",
+          "#777af3",
+          "#afb1f8",
+          "#e8e8fd"
+        ]
+      },
+      "iris-soft": {
+        "role": "secondary",
+        "displayName": "Gain Iris",
+        "tonalRamp": [
+          "#00024c",
+          "#000385",
+          "#0004bd",
+          "#0005f5",
+          "#3338ff",
+          "#6b6eff",
+          "#a8aaff",
+          "#e5e6ff"
+        ]
+      },
+      "lavender": {
+        "role": "tertiary",
+        "displayName": "Cap Lavender",
+        "tonalRamp": [
+          "#190448",
+          "#2b077e",
+          "#3d0ab3",
+          "#500de8",
+          "#753ef4",
+          "#9b73f7",
+          "#c5adfa",
+          "#eee7fe"
+        ]
+      },
+      "coral": {
+        "role": "tertiary",
+        "displayName": "Backstop Coral",
+        "tonalRamp": [
+          "#440808",
+          "#760e0e",
+          "#a91414",
+          "#db1a1a",
+          "#e94949",
+          "#ef7b7b",
+          "#f6b2b2",
+          "#fce8e8"
+        ]
+      },
+      "coral-soft": {
+        "role": "tertiary",
+        "displayName": "Fault Pink",
+        "tonalRamp": [
+          "#4c0000",
+          "#850000",
+          "#bd0000",
+          "#f50000",
+          "#ff3333",
+          "#ff6b6b",
+          "#ffa8a8",
+          "#ffe5e5"
+        ]
+      },
+      "teal": {
+        "role": "tertiary",
+        "displayName": "Walker Teal",
+        "tonalRamp": [
+          "#01444c",
+          "#017683",
+          "#02a9bb",
+          "#02dbf2",
+          "#35e9fd",
+          "#6deffe",
+          "#a9f6fe",
+          "#e6fcff"
+        ]
+      },
+      "signal-green": {
+        "role": "signal",
+        "displayName": "Go Green",
+        "tonalRamp": [
+          "#0f3e19",
+          "#196b2c",
+          "#24993f",
+          "#2fc651",
+          "#5ad877",
+          "#87e39c",
+          "#b9efc5",
+          "#eafaee"
+        ]
+      },
+      "signal-amber": {
+        "role": "signal",
+        "displayName": "Yellow Amber",
+        "tonalRamp": [
+          "#483005",
+          "#7c5408",
+          "#b1770c",
+          "#e59b0f",
+          "#f2b440",
+          "#f6c974",
+          "#fadfae",
+          "#fdf6e7"
+        ]
+      },
+      "signal-red": {
+        "role": "signal",
+        "displayName": "Stop Red",
+        "tonalRamp": [
+          "#4c0400",
+          "#850800",
+          "#bd0b00",
+          "#f50e00",
+          "#ff3f33",
+          "#ff746b",
+          "#ffada8",
+          "#ffe7e5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Results page title only."
+      },
+      "title-lg": {
+        "displayName": "Title Large",
+        "purpose": "Selected junction name in the rail."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Pane heads (510) and rail section heads (590)."
+      },
+      "metric": {
+        "displayName": "Metric",
+        "purpose": "Live KPI values; tabular, tight."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text and controls."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "KPI terms, table headers, legends; sentence case."
+      },
+      "mono-display": {
+        "displayName": "Mono Display",
+        "purpose": "Simulation clock."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Junction IDs, phase names, axis ticks, code."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ring",
+        "value": "rgb(35 37 42) 0 0 0 1px inset",
+        "purpose": "Edge of every container and ghost control."
+      },
+      {
+        "name": "hairline-divider",
+        "value": "0 1px 0 #23252a",
+        "purpose": "Bar bottom, pane heads, table rows, rail blocks (also 0 -1px 0 and -1px 0 0)."
+      },
+      {
+        "name": "lime-bevel",
+        "value": "rgba(0,0,0,.08) 0 1px 1px inset, rgba(255,255,255,.35) 0 1px 0 inset",
+        "purpose": "Primary button only."
+      },
+      {
+        "name": "segment-lift",
+        "value": "rgba(255,255,255,.04) 0 1px 0 inset, rgba(0,0,0,.4) 0 1px 2px",
+        "purpose": "Selected segmented option."
+      },
+      {
+        "name": "toast-float",
+        "value": "rgba(255,255,255,.04) 0 1px 0 inset, rgba(0,0,0,.6) 0 0 0 1px, rgba(0,0,0,.35) 0 8px 24px",
+        "purpose": "The toast, the only floating element."
+      },
+      {
+        "name": "focus",
+        "value": "outline: 1.5px solid #d0d6e0; outline-offset: 2px",
+        "purpose": "Keyboard focus on all interactive elements."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "All eased transitions."
+      },
+      {
+        "name": "state",
+        "value": "150ms",
+        "purpose": "Hover, selected and pressed colour changes."
+      },
+      {
+        "name": "enter",
+        "value": "200ms",
+        "purpose": "Toast rise and fade."
+      },
+      {
+        "name": "empty-veil",
+        "value": "300ms",
+        "purpose": "Empty-map overlay fading out on run."
+      },
+      {
+        "name": "bar-grow",
+        "value": "250ms",
+        "purpose": "Demand bar width changes."
+      },
+      {
+        "name": "shield-flash",
+        "value": "1.6s",
+        "purpose": "Coral wash on the reason line when the shield takes over."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "pane-compact",
+        "value": "500px"
+      },
+      {
+        "name": "mobile",
+        "value": "760px"
+      },
+      {
+        "name": "stack-rail",
+        "value": "1100px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Run / Restart: the one lime action on a surface.",
+      "html": "<button class=\"ds-btn-primary\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M7 4.5v15l12-7.5z\" fill=\"currentColor\"/></svg><span>Run</span></button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 14px; border:0; border-radius:6px; cursor:pointer; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-weight:510; font-size:13px; line-height:1; letter-spacing:-.011em; background:#e4f222; color:#08090a; box-shadow: rgba(0,0,0,.08) 0 1px 1px inset, rgba(255,255,255,.35) 0 1px 0 inset; transition: background .15s; } .ds-btn-primary:hover { background:#eef75a; } .ds-btn-primary:active { background:#cfdc1c; } .ds-btn-primary:focus-visible { outline:1.5px solid #d0d6e0; outline-offset:2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary actions and icon buttons; ringed, transparent. Pressed toggle turns coral.",
+      "html": "<div style=\"display:flex;gap:8px\"><button class=\"ds-btn-ghost ds-icon-only\" aria-label=\"Pause\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M8 5v14M16 5v14\"/></svg></button><button class=\"ds-btn-ghost\">Fit town</button><button class=\"ds-btn-ghost\" aria-pressed=\"true\">Lane blocked</button></div>",
+      "css": ".ds-btn-ghost { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:32px; padding:0 12px; border:0; border-radius:6px; cursor:pointer; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size:13px; line-height:1; background:transparent; color:#d0d6e0; box-shadow: rgb(35 37 42) 0 0 0 1px inset; transition: background .15s, color .15s, box-shadow .15s; } .ds-btn-ghost:hover { background:rgba(255,255,255,.04); color:#fff; } .ds-btn-ghost:focus-visible { outline:1.5px solid #d0d6e0; outline-offset:2px; } .ds-btn-ghost[aria-pressed=\"true\"] { background:rgba(235,87,87,.12); color:#ffb4b4; box-shadow: rgba(235,87,87,.45) 0 0 0 1px inset; } .ds-icon-only { width:32px; padding:0; }"
+    },
+    {
+      "name": "Tiny Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost-tiny",
+      "description": "Camera fault actions (Blind, Kill, Flaky, Restore).",
+      "html": "<button class=\"ds-btn-tiny\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" width=\"13\" height=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v8M6.4 6.4a8 8 0 1 0 11.2 0\"/></svg>Kill</button>",
+      "css": ".ds-btn-tiny { display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 8px; border:0; border-radius:6px; cursor:pointer; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size:12px; background:transparent; color:#d0d6e0; box-shadow: rgb(35 37 42) 0 0 0 1px inset; transition: background .15s, color .15s; } .ds-btn-tiny:hover { background:rgba(255,255,255,.04); color:#fff; } .ds-btn-tiny:focus-visible { outline:1.5px solid #d0d6e0; outline-offset:2px; }"
+    },
+    {
+      "name": "Tabs",
+      "kind": "nav",
+      "refersTo": "tab",
+      "description": "Top-bar view switch, text only.",
+      "html": "<nav class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab\" role=\"tab\" aria-selected=\"true\">Live</button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">Results</button></nav>",
+      "css": ".ds-tabs { display:flex; gap:4px; background:#0f1011; padding:8px; } .ds-tab { font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size:13px; color:#8a8f98; background:none; border:0; cursor:pointer; padding:6px 10px; border-radius:6px; transition: color .15s, background .15s; } .ds-tab:hover { color:#d0d6e0; background:rgba(255,255,255,.03); } .ds-tab[aria-selected=\"true\"] { color:#fff; background:rgba(255,255,255,.05); } .ds-tab:focus-visible { outline:1.5px solid #d0d6e0; outline-offset:2px; }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "chip",
+      "refersTo": "segmented-option-selected",
+      "description": "Speed and map layout switches.",
+      "html": "<div class=\"ds-seg\" role=\"radiogroup\"><button role=\"radio\" aria-checked=\"false\">2×</button><button role=\"radio\" aria-checked=\"true\">8×</button><button role=\"radio\" aria-checked=\"false\">30×</button></div>",
+      "css": ".ds-seg { display:inline-flex; padding:2px; border-radius:8px; background:rgba(255,255,255,.02); box-shadow: rgb(35 37 42) 0 0 0 1px inset; } .ds-seg button { font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size:13px; line-height:1; color:#8a8f98; background:none; border:0; cursor:pointer; height:28px; padding:0 10px; border-radius:6px; font-variant-numeric:tabular-nums; transition: color .15s, background .15s; } .ds-seg button:hover { color:#d0d6e0; } .ds-seg button[aria-checked=\"true\"] { background:#161718; color:#fff; box-shadow: rgba(255,255,255,.04) 0 1px 0 inset, rgba(0,0,0,.4) 0 1px 2px; } .ds-seg button:focus-visible { outline:1.5px solid #d0d6e0; outline-offset:2px; }"
+    },
+    {
+      "name": "Select",
+      "kind": "input",
+      "refersTo": "select",
+      "description": "Scenario picker; native select with chevron.",
+      "html": "<label class=\"ds-select\"><select><option>Evening rush</option><option>Midday</option></select><svg class=\"ds-chev\" viewBox=\"0 0 24 24\" width=\"14\" height=\"14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 10l5 5 5-5\"/></svg></label>",
+      "css": ".ds-select { position:relative; display:inline-flex; align-items:center; } .ds-select select { appearance:none; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size:13px; color:#d0d6e0; height:32px; padding:0 30px 0 12px; border-radius:6px; cursor:pointer; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.08); } .ds-select select:hover { border-color:#383b3f; } .ds-select select:focus-visible { outline:1.5px solid #d0d6e0; outline-offset:2px; } .ds-select option { background:#161718; } .ds-chev { position:absolute; right:9px; color:#8a8f98; pointer-events:none; }"
+    },
+    {
+      "name": "Map Pane Head",
+      "kind": "card",
+      "refersTo": "pane",
+      "description": "Carbon pane with run dot, title and live tabular metrics over the map canvas.",
+      "html": "<article class=\"ds-pane\"><header class=\"ds-pane-head\"><h2>AI (PPO)</h2><dl class=\"ds-kpis\"><div><dt>Waiting now</dt><dd>93<small>people</small></dd></div><div><dt>Time lost</dt><dd>5.1<small>person-h</small> <span class=\"ds-better\">−42%</span></dd></div><div><dt>Longest red</dt><dd>115<small>s</small></dd></div></dl></header><div class=\"ds-map\"></div></article>",
+      "css": ".ds-pane { border-radius:12px; background:#0f1011; box-shadow: rgb(35 37 42) 0 0 0 1px inset; overflow:hidden; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-pane-head { display:grid; gap:8px; padding:12px 14px 10px; box-shadow:0 1px 0 #23252a; } .ds-pane-head h2 { margin:0; font-size:14px; font-weight:510; color:#fff; letter-spacing:-.011em; display:flex; align-items:center; gap:8px; } .ds-pane-head h2::before { content:''; width:6px; height:6px; border-radius:50%; background:#6366f1; } .ds-kpis { display:flex; gap:24px; margin:0; } .ds-kpis div { display:flex; flex-direction:column; } .ds-kpis dt { font-size:11px; color:#8a8f98; line-height:1.3; } .ds-kpis dd { margin:0; font-size:17px; font-weight:510; line-height:1.25; color:#fff; letter-spacing:-.02em; font-variant-numeric:tabular-nums; } .ds-kpis small { font-size:11px; font-weight:400; color:#8a8f98; margin-left:2px; } .ds-better { font-size:11px; color:#a5a7ff; } .ds-map { height:80px; background:#0b0c0d; }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "Junction camera status; neutral and fault variants.",
+      "html": "<div style=\"display:flex;gap:8px\"><span class=\"ds-status\">Cameras OK</span><span class=\"ds-status ds-bad\">Camera down</span></div>",
+      "css": ".ds-status { font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size:11px; padding:1px 8px; border-radius:9999px; background:rgba(255,255,255,.05); color:#8a8f98; } .ds-bad { background:rgba(235,87,87,.14); color:#ffb4b4; }"
+    },
+    {
+      "name": "Phase Ribbon",
+      "kind": "custom",
+      "refersTo": "phase-ribbon",
+      "description": "Signature: five-minute timeline of served greens, each coloured by the shield's reason.",
+      "html": "<div class=\"ds-rib\"><span class=\"ds-rl\">AI</span><div class=\"ds-well\"><i style=\"left:2%;width:9%;background:#6366f1\">E–W</i><i style=\"left:14%;width:6%;background:#6366f1\"></i><i style=\"left:23%;width:11%;background:#8b5cf6\">N–S</i><i style=\"left:37%;width:8%\" class=\"ds-hatch\"></i><i style=\"left:48%;width:5%;background:#4a4e55\"></i><i style=\"left:56%;width:12%;background:#eb5757\">Walk</i><i style=\"left:71%;width:10%;background:#6366f1\">E–W</i></div></div><div class=\"ds-axis\"><span>−5 min</span><span>now</span></div>",
+      "css": ".ds-rib { display:grid; grid-template-columns:38px 1fr; align-items:center; gap:8px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; } .ds-rl { font-size:11px; color:#8a8f98; } .ds-well { position:relative; height:26px; border-radius:4px; background:#08090a; box-shadow: rgb(35 37 42) 0 0 0 1px inset; } .ds-well i { position:absolute; top:4px; bottom:4px; border-radius:2px; opacity:.9; font:500 10px/18px 'JetBrains Mono', ui-monospace, monospace; font-style:normal; color:#fff; padding-left:4px; overflow:hidden; } .ds-hatch { background: repeating-linear-gradient(135deg, #eb5757 0 2px, transparent 2px 4px); box-shadow: rgba(235,87,87,.6) 0 0 0 1px inset; } .ds-axis { display:flex; justify-content:space-between; padding-left:46px; margin-top:6px; color:#8a8f98; font:400 10.5px 'JetBrains Mono', ui-monospace, monospace; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Midnight Signal Box",
+    "overview": "A precision instrument at night. The world comes from the user-pinned visual reference, Refero's write-up of Linear's style (\"midnight precision instrument\"): its near-black canvas, hairline rings, three-weight Inter and tight numeric tracking are adopted as a style; nothing of Linear's brand (name, mark, product colours as identity) is carried. Here the instrument watches a town: the map and each junction's reasoning are the content, and every surface around them recedes into graded near-blacks so that the few saturated hues on screen always mean something.\n\nDensity is high and calm: 13px body, 11px labels, tabular numerals everywhere numbers live, hairlines instead of boxes. Colour is a vocabulary, not a mood. Lime is the one action. Iris, lavender and coral name why a light went green. Red, amber and green are reserved for the state of a real light. Everything else is a grey.",
+    "keyCharacteristics": [
+      "Graded near-black surfaces (void, carbon, obsidian, raised) separated by 1px inset rings, not borders or shadows.",
+      "One lime primary action per screen.",
+      "A reason palette (iris, lavender, coral, slate, hatch) that encodes the safety shield's decisions.",
+      "Signal colours treated as data: they appear only where a light's state is shown.",
+      "Inter at 400 / 510 / 590 with negative tracking on numbers; JetBrains Mono for IDs, timers and phase names.",
+      "Line icons at 16px, 1.6 stroke, round caps."
+    ],
+    "rules": [
+      {
+        "name": "The One Lime Rule",
+        "body": "Lime marks the one primary action on a surface. If two things are lime, one of them is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reason Palette Rule",
+        "body": "Iris, lavender, coral, slate and the coral hatch encode why a phase was served. Never reuse them as decoration or category colour; a new reason gets a new, documented hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signal Is Data Rule",
+        "body": "Red, amber and green appear only where a light's actual state is drawn. They are never status, success or error colours for UI.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Numbers Rule",
+        "body": "Every number that updates live is tabular and slightly tight. Numbers must not jitter as they tick.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Shouting Rule",
+        "body": "No uppercase labels, no bold above 590. Hierarchy is weight 400 / 510 / 590 and colour paper / mist / fog.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ring Not Border Rule",
+        "body": "Container edges are 1px inset rings in line colour. The one real border in the system is the native select (1px white at 8%).",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep every surface on the void / carbon / obsidian ladder and draw edges with the 1px ring.",
+      "Do give lime to exactly one action per surface.",
+      "Do colour phase and decision data with the reason palette and say what each hue means in a visible legend.",
+      "Do set live numbers in tabular Inter 510 with negative tracking, units in 11px fog.",
+      "Do use 16px line icons (1.6 stroke, round caps, currentColor) from the inline sprite.",
+      "Do show where the AI loses in plain fog text, as visibly as its wins in iris-soft.",
+      "Do use the cubic-bezier(.16, 1, .3, 1) ease and 150ms state transitions."
+    ],
+    "donts": [
+      "Don't use red, amber or green for UI status, success or error; they belong to lights.",
+      "Don't reuse iris, lavender or coral as category or decorative colour.",
+      "Don't use gradients, except the coral sensor-fallback hatch, which is data.",
+      "Don't introduce uppercase labels, small text above the headings, or weights above 590.",
+      "Don't add drop shadows to panels or cards; depth is tonal.",
+      "Don't carry Linear's name, logo or brand identity; the reference supplies the style only."
+    ]
+  }
+}
