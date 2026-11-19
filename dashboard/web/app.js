@@ -20,6 +20,11 @@ const REASON = {
 const EVENT_ICON = { accident: "i-crash", breakdown: "i-wrench", jaywalker: "i-walk", impaired: "i-swerve",
   ambulance: "i-siren", snowstorm: "i-snow", roadworks: "i-cone" };
 
+/* The hosted copy (Vercel) has no simulator: it plays races recorded by dashboard/export_static.py. */
+const STATIC = !!window.BENCH_STATIC;
+const API = STATIC ? { options: "data/options.json", network: "data/network.json", results: "data/results.json" }
+  : { options: "/api/options", network: "/api/network", results: "/api/results" };
+
 const state = {
   opts: null, geo: null, ws: null, outbox: [], running: false, starting: false, paused: false,
   selected: 0, frame: null, prevVeh: new Map(), curVeh: new Map(), frameAt: 0, frameGap: 250,
@@ -28,7 +33,7 @@ const state = {
 
 /* ---------------- startup ---------------- */
 async function init() {
-  const [opts, geo] = await Promise.all([fetch("/api/options").then(r => r.json()), fetch("/api/network").then(r => r.json())]);
+  const [opts, geo] = await Promise.all([fetch(API.options).then(r => r.json()), fetch(API.network).then(r => r.json())]);
   state.opts = opts; state.geo = geo;
   fillSelect($("#season"), opts.seasons.map(s => [s.id, `${s.title} · ${s.months}`]), "winter");
   fillSelect($("#profile"), opts.profiles.map(p => [p.id, p.title]), "evening_rush");
@@ -36,7 +41,7 @@ async function init() {
   buildEvents();
   map.init(geo);
   wire();
-  connect();
+  if (STATIC) replay.init(); else connect();
 }
 
 function fillSelect(sel, items, value) {
@@ -143,6 +148,7 @@ function connect() {
   ws.onclose = () => { state.running = false; setRunning(false); setTimeout(connect, 1500); };
 }
 function send(m) {
+  if (STATIC) { replay.handle(m); return; }
   if (state.ws && state.ws.readyState === 1) state.ws.send(JSON.stringify(m)); else state.outbox.push(m);
 }
 
@@ -190,7 +196,7 @@ function onMessage(m) {
     renderBoard();
     renderLog(m.log);
     renderDetail();
-    if (m.done) { setRunning(false); $("#run span").textContent = "Run again"; toast("The hour is over. Results tab has the averaged comparison."); }
+    if (m.done) { setRunning(false); $("#run span").textContent = "Run again"; toast(STATIC ? "End of the recording. The Results tab has the full comparison." : "The hour is over. Results tab has the averaged comparison."); }
   }
 }
 
@@ -497,7 +503,7 @@ const results = {
     const box = $("#resultsBody");
     if (!state.results) {
       box.innerHTML = `<p class="empty-results">Loading results…</p>`;
-      state.results = await fetch("/api/results").then(r => r.json()).catch(() => ({ available: false }));
+      state.results = await fetch(API.results).then(r => r.json()).catch(() => ({ available: false }));
     }
     this.render();
   },
@@ -628,6 +634,83 @@ function fixesCard() {
     <li><b>Bugs found in the simulator</b><p>SUMO activated the last-loaded (actuated) plan, so the “fixed timer” was secretly actuated; speeders with a 0.8 s gap crashed and got teleported; parallel training workers raced on the same traffic file; crashed cars counted as “waiting”, which pulled the 90 s rule toward blocked roads. All fixed and re-tested before training.</p></li>
   </ul></section>`;
 }
+
+/* ---------------- recorded races (hosted copy) ---------------- */
+const replay = {
+  files: new Map(), data: null, i: 0, timer: null, speed: 4, paused: false, lights: [], log: [],
+  init() {
+    const o = state.opts, have = o.replays || [];
+    const seasons = [...new Set(have.map(r => r.season))];
+    fillSelect($("#season"), o.seasons.filter(s => seasons.includes(s.id)).map(s => [s.id, `${s.title} · ${s.months}`]), "winter");
+    const profiles = () => {
+      const ids = have.filter(r => r.season === $("#season").value).map(r => r.profile);
+      fillSelect($("#profile"), o.profiles.filter(p => ids.includes(p.id)).map(p => [p.id, p.title]), $("#profile").value || "evening_rush");
+    };
+    profiles();
+    $("#season").addEventListener("change", profiles);
+    $$("#slots select").forEach((s, i) => { s.value = (o.replay_controllers || [])[i] || ""; s.disabled = true; });
+    $("#shield").disabled = true;
+    $("#shield").title = "Recorded with the safety shield on. Run the project locally to switch it off.";
+    const hints = $$(".block-head .hint");
+    if (hints[0]) hints[0].textContent = "recorded: best run of each strategy";
+    if (hints[1]) hints[1].textContent = "scripted in the recording";
+    $("#scenarioLine").innerHTML = `Recorded races, ${o.replay_minutes} minutes each. Pick a season and a time of day, then press Run.`;
+    const empty = $(".log-empty");
+    if (empty) empty.textContent = "An accident, a person running across, an ambulance, an impaired driver and a breakdown are thrown in at fixed minutes; the season's own events appear too.";
+  },
+  async handle(m) {
+    if (m.cmd === "start") {
+      clearTimeout(this.timer);
+      const r = (state.opts.replays || []).find(x => x.season === m.season && x.profile === m.profile);
+      if (!r) { onMessage({ type: "error", message: "no recording for this season and time of day" }); return; }
+      try {
+        if (!this.files.has(r.file)) this.files.set(r.file, await fetch("data/" + r.file).then(x => x.json()));
+      } catch (e) { onMessage({ type: "error", message: "could not load the recording" }); return; }
+      this.data = this.files.get(r.file);
+      this.i = 0; this.paused = false;
+      this.lights = this.data.controllers.map(() => ({}));
+      this.log = [];
+      onMessage({ type: "started", controllers: this.data.controllers.map(c => c.id) });
+      this.tick();
+    } else if (m.cmd === "speed") {
+      this.speed = +m.value || 4;
+    } else if (m.cmd === "pause") {
+      this.paused = !!m.value;
+      clearTimeout(this.timer);
+      if (!this.paused) this.tick();
+    } else if (m.cmd === "select" && this.data && this.i > 0) {
+      onMessage(this.frame(this.i - 1));
+    } else if (m.cmd === "event") {
+      toast("This hosted copy plays recorded races. Run the project locally to throw your own events.");
+    }
+  },
+  tick() {
+    if (this.paused || !this.data || this.i >= this.data.frames.length) return;
+    const f = this.data.frames[this.i];
+    f.r.forEach((r, k) => { if (r.l) Object.assign(this.lights[k], r.l); });
+    if (f.log) this.log = f.log;
+    onMessage(this.frame(this.i));
+    this.i += 1;
+    if (this.i < this.data.frames.length) this.timer = setTimeout(() => this.tick(), 1000 * this.data.dt / this.speed);
+  },
+  frame(i) {
+    const D = this.data, f = D.frames[i], last = i === D.frames.length - 1;
+    const runs = f.r.map((r, k) => {
+      const kpi = {};
+      D.kpi.forEach((name, j) => { kpi[name] = r.k[j]; });
+      const c = D.controllers[k];
+      const item = { id: c.id, label: c.label, done: !!r.d || last, kpi };
+      if (k === state.selected) {
+        const veh = [], ppl = [];
+        for (let j = 0; j < r.v.length; j += 5) veh.push([r.v[j], r.v[j + 1], r.v[j + 2], r.v[j + 3], D.kinds[r.v[j + 4] >> 1], r.v[j + 4] & 1]);
+        for (let j = 0; j < r.p.length; j += 3) ppl.push([r.p[j], r.p[j + 1], r.p[j + 2]]);
+        Object.assign(item, { veh, ppl, lights: this.lights[k], events: r.e || [], snow: !!r.s });
+      }
+      return item;
+    });
+    return { type: "frame", t: f.t, log: this.log, runs, done: last };
+  },
+};
 
 /* ---------------- misc ---------------- */
 let toastTimer;

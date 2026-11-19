@@ -258,7 +258,7 @@ class Live:
                 r.last[v] = (s[tc.VAR_TIMELOSS], s[tc.VAR_ACCUMULATED_WAITING_TIME])
                 run_loss += s[tc.VAR_TIMELOSS]
                 run_wait += s[tc.VAR_ACCUMULATED_WAITING_TIME]
-                if k == selected:
+                if selected < 0 or k == selected:
                     x, y = s[tc.VAR_POSITION]
                     t = s[tc.VAR_TYPE]
                     kind = "x" if v in frozen else {"bus": "b", "van": "v", "speeder": "s", "impaired": "i",
@@ -274,7 +274,7 @@ class Live:
                             "arrived": st.arrived, "hidden": getattr(sim, "_backlog", 0),
                             "teleports": st.teleports, "maxWait": round(st.max_wait),
                             "ambulance": round(sum(st.ambulance_times) / len(st.ambulance_times)) if st.ambulance_times else None}}
-            if k == selected:
+            if selected < 0 or k == selected:
                 ppl = [[round(s[tc.VAR_POSITION][0], 1), round(s[tc.VAR_POSITION][1], 1), 1 if s[tc.VAR_SPEED] < 0.2 else 0]
                        for s in c.person.getAllSubscriptionResults().values()]
                 lights = {}
