@@ -205,7 +205,12 @@ class AstanaSim:
         frozen = self.events.frozen() if hasattr(self, "events") else set()   # known crashes: not "waiting"
         for L in self.lights:
             for ln in L.in_lanes:
-                ids = [v for v in sub[ln][tc.LAST_STEP_VEHICLE_ID_LIST] if v not in frozen]
+                # cars stand back to front; only those ahead of a crashed/broken-down car can reach the
+                # light, the ones behind it wait for the tow truck, not for a green
+                ids = list(sub[ln][tc.LAST_STEP_VEHICLE_ID_LIST])
+                blocked = [k for k, v in enumerate(ids) if v in frozen]
+                if blocked:
+                    ids = ids[blocked[-1] + 1:]
                 lane_wait[ln] = c.vehicle.getWaitingTime(ids[-1]) if ids else 0.0
         for cid, cam in self.cams.items():
             cam.fault = self._fault(cid)

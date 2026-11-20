@@ -280,7 +280,7 @@ function renderLog(items) {
   const run = state.frame.runs[state.selected];
   const auto = (run && run.events) ? run.events.filter(e => !items.some(x => x.kind === e.kind && Math.abs(x.t - state.frame.t) < 3)) : [];
   if (!items.length && !auto.length) return;
-  const rows = items.map(x => `<li><span class="t">${clock(x.t)}</span><span class="pill you">${esc(x.label)}</span><span class="where">${x.street ? esc(x.street) + " · " : ""}thrown in by you</span></li>`);
+  const rows = items.map(x => `<li><span class="t">${clock(x.t)}</span><span class="pill you">${esc(x.label)}</span><span class="where">${x.street ? esc(x.street) + " · " : ""}${STATIC ? "scripted, all four at once" : "thrown in by you"}</span></li>`);
   const live = auto.map(e => `<li><span class="t">now</span><span class="pill">${esc(e.label)}</span><span class="where">${e.left ? `clears in ${Math.ceil(e.left / 60)} min` : "under way"}${e.note ? " · " + esc(e.note) : ""}</span></li>`);
   ol.innerHTML = live.concat(rows).join("");
 }
@@ -631,7 +631,8 @@ function fixesCard() {
     <li><b>Throughput = arrived</b><p>Two names for one number over a fixed hour. Both are shown, but they always agree.</p></li>
     <li><b>Fair comparison</b><p>Same traffic, same events and new seeds for every controller, and every strategy gets the same budget of simulated hours. The central brain collects 1 training sample per decision against 12 for the per-light agents, so we also trained it with 4× the budget to see whether it just needs more data.</p></li>
     <li><b>DQN and the central brain</b><p>A central DQN would have to score 4¹² ≈ 16.8 million joint actions. It cannot, so DQN runs for the per-light strategies only; PPO and A2C run for all three.</p></li>
-    <li><b>Bugs found in the simulator</b><p>SUMO activated the last-loaded (actuated) plan, so the “fixed timer” was secretly actuated; speeders with a 0.8 s gap crashed and got teleported; parallel training workers raced on the same traffic file; crashed cars counted as “waiting”, which pulled the 90 s rule toward blocked roads. All fixed and re-tested before training.</p></li>
+    <li><b>Bugs found in the simulator</b><p>SUMO activated the last-loaded (actuated) plan, so the “fixed timer” was secretly actuated; speeders with a 0.8 s gap crashed and got teleported; parallel training workers raced on the same traffic file; crashed cars counted as “waiting”, which pulled the 90 s rule toward blocked roads; SUMO's ambulance blue-light device crashed the simulator mid-training. All fixed and re-tested before training.</p></li>
+    <li><b>Found in the results</b><p>The first evaluation showed cars standing 5–7 minutes at J07 even on green. The OSM import had made Zhangeldin give way to a 45 m slip road 8 m past the light, so the light's exit kept freezing; two such spots now give the main street right of way. Cars stuck behind a broken-down car also counted as waiting for the light, sending the 90 s rule's green to a lane nobody could drive on. Both fixed, then everything was evaluated again.</p></li>
   </ul></section>`;
 }
 

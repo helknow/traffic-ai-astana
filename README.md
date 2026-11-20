@@ -19,7 +19,68 @@ compared with today's **fixed timers**, SUMO's **actuated** lights and a **max-p
 <!-- RESULTS:START -->
 ## Results
 
-Training and evaluation are running; the verdict and every metric land here when they finish.
+**Live demo (recorded races + full results):** https://traffic-ai-astana.vercel.app
+
+Every controller drove **48 one-hour tests** (4 seasons × 4 times of day × 3 days of traffic the
+AI never trained on), with the same accidents, breakdowns, jaywalkers, ambulances and snowstorms
+for every controller. Averages over all 48:
+
+| Controller | Time lost /veh | Waiting /veh | Travel time | Queue | Throughput /h | Teleports | Hidden queue | Longest standstill | Pedestrian loss | CO₂ (kg) | Ambulance crossing | vs fixed |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Independent · PPO** | **108.6 s** | 50.1 s | 208.5 s | **29.1** | 2 393 | 0.7 | 93.6 | 188 s | 99.1 s | 1 478 | **147 s** | **−52 %** |
+| Neighbour-aware · PPO | 109.8 s | **48.2 s** | 209.8 s | 29.8 | **2 396** | **0.1** | 92.2 | **184 s** | 98.2 s | 1 481 | 163 s | −52 % |
+| Central brain · PPO | 137.1 s | 74.2 s | 236.4 s | 42.9 | 2 339 | 0.4 | 111.2 | 230 s | 107.2 s | 1 588 | 166 s | −40 % |
+| Central brain · PPO · 4× training | 139.6 s | 74.3 s | 238.6 s | 39.6 | 2 312 | 0.4 | 124.1 | 231 s | 108.4 s | 1 582 | 162 s | −39 % |
+| Max-pressure (classic, no learning) | 137.9 s | 64.8 s | 236.6 s | 41.2 | 2 335 | 1.2 | **83.8** | 243 s | **96.9 s** | 1 617 | 172 s | −39 % |
+| Actuated (SUMO) | 154.6 s | 79.8 s | 252.2 s | 55.6 | 2 324 | 0.8 | 94.4 | 211 s | 105.3 s | 1 682 | 155 s | −32 % |
+| Fixed timer (Astana today) | 227.7 s | 138.9 s | 322.7 s | 94.1 | 2 182 | 2.4 | 120.5 | 233 s | 102.4 s | 1 956 | 222 s | – |
+
+Throughput equals arrived vehicles per hour (one hour per test). All 15 controllers, including A2C,
+DQN and shield-off runs, are in `results/summary.csv` and on the Results page.
+
+**Time lost per vehicle by season** (best run of each strategy):
+
+| | Winter | Spring | Summer | Autumn |
+|---|---|---|---|---|
+| Independent · PPO | **142 s** | **95 s** | **84 s** | 114 s |
+| Neighbour-aware · PPO | 147 s | 96 s | 85 s | **111 s** |
+| Central brain · PPO | 202 s | 108 s | 100 s | 138 s |
+| Max-pressure | 187 s | 123 s | 105 s | 137 s |
+| Fixed timer | 263 s | 223 s | 174 s | 251 s |
+
+### Verdict: which strategy is better?
+
+1. **Strategy 1, independent agents, wins.** It cuts the time each vehicle loses by **52 %** against
+   today's fixed timers, raises throughput by 10 %, cuts CO₂ by 24 % and gets ambulances through
+   34 % faster. It beats the central brain in **all 16** season × time-of-day scenarios.
+2. **Strategy 2, the central brain with sub-agents, is 26 % worse** and only ties the classic
+   max-pressure rule, which needs no training at all. **More data does not fix it:** with 4× the
+   training it is no better (140 s vs 137 s). The problem is the design: one model has to choose
+   4¹² ≈ 16.8 million joint actions from one shared reward, so it cannot tell which light's choice
+   helped. Each independent agent gets its own reward and 12× more examples per decision.
+3. **The middle ground, neighbour-aware agents, ties the winner** (+1 %, wins 5 of 16 scenarios,
+   best in autumn, lowest waiting and almost no teleports). On this 12-light grid, hearing the
+   neighbours buys almost nothing. It is the variant to keep for a bigger network, where green
+   waves along long avenues matter more.
+4. **PPO is the best algorithm** for every strategy (independent: PPO 109 s, A2C 112 s,
+   DQN 118 s). DQN cannot run the central brain at all.
+
+### What are we losing?
+
+- **Coordination:** independent lights do not plan green waves. The neighbour-aware test shows this
+  costs almost nothing here; re-check it on a larger map.
+- **Pedestrians and entry fairness, a little:** max-pressure keeps pedestrians ~2 s faster and
+  lets ~10 more cars into the map per hour (hidden queue 84 vs 94). The RL reward could weigh
+  pedestrians and entry queues more if the akimat cares about these.
+- **The shield costs ~2 % speed and buys safety:** switched off, independent agents lose 106 s
+  instead of 109 s, but the longest standstill at a red grows from 188 s to 285 s. Without the
+  shield the central brain collapses into gridlock (718 s lost, 104 teleports per hour). **Keep the
+  shield.**
+- **Honest limits:** the 90 s rule serves a waiting direction next, but the green still has to
+  finish its minimum and change over, and two overdue directions can queue behind each other, so
+  the worst single standstill is about 2–3 minutes, not 90 s. The seasons are assumptions until
+  calibrated with Astana data, and the models were trained before the last two map fixes below
+  (retraining may add a little more).
 <!-- RESULTS:END -->
 
 ## The map
@@ -104,6 +165,13 @@ waiting at crosswalks. **What we changed and why:**
 - Crashed cars counted as "waiting", which pulled the 90 s rule toward blocked roads.
 - SUMO's ambulance *bluelight* device crashed the simulator natively mid-training. Removed;
   ambulances still drive through reds. Dead workers now restart automatically.
+- **Found in the first evaluation:** cars stood 5–7 minutes at J07 even on green. The OSM import
+  had made Zhangeldin give way to a 45 m unnamed slip road 8 m past the light, so the light's exit
+  kept freezing. `map/fix_priorities.py` gives the main street right of way at the two such spots
+  (traffic-light programs unchanged, guarded by a test). The learned controllers lost 4–14 s less
+  per vehicle afterwards; the fixed timers barely changed.
+- Cars stuck behind a broken-down car counted as waiting for the light, sending the 90 s rule's
+  green to a lane nobody could drive on. They no longer count. Everything was then evaluated again.
 
 ## Safety shield (toggle)
 
@@ -125,12 +193,13 @@ Python 3.11; SUMO comes from `pip install eclipse-sumo`.
 
 ```bash
 pip install -r requirements.txt
-pytest                                    # 42 tests: map, transitions, shield, events, envs
+pytest                                    # 43 tests: map, transitions, shield, events, envs
 python dashboard/server.py                # race board on http://localhost:8790
 python train.py --strategy central --algo ppo --sim-hours 400
 ./train_all.sh                            # all strategies × algorithms (~5 h on 20 cores)
 python evaluate.py                        # 4 seasons × 4 times of day × 3 days, writes results/
-python map/build_map.py                   # rebuild the map from OpenStreetMap
+python map/build_map.py && python map/fix_priorities.py   # rebuild the map from OpenStreetMap
+python dashboard/export_static.py         # recorded races + results for a static host (site/)
 ```
 
 ## Layout

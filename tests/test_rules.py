@@ -118,6 +118,15 @@ def test_speeders_keep_a_physically_possible_headway():
     assert tau >= 1.0
 
 
+def test_main_street_keeps_right_of_way_just_past_a_light():
+    """OSM import made Zhangeldin give way to a slip road 8 m after J07, freezing the light's exit."""
+    import xml.etree.ElementTree as ET
+
+    from env.tls import NET_FILE
+    from map.fix_priorities import problems
+    assert problems(ET.parse(NET_FILE).getroot()) == []
+
+
 def test_no_bluelight_device():
     """SUMO's bluelight device crashed the simulator natively during training."""
     assert "bluelight" not in write_routes("night", "winter", 18).read_text()

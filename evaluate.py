@@ -161,7 +161,7 @@ def main() -> None:
     pd.DataFrame(flat).to_csv(RES / "summary.csv", index=False)
     summary = {"seeds": args.seeds, "seasons": args.seasons, "profiles": args.profiles, "controllers": ctrls,
                "results": summarise(rows)}
-    (RES / "summary.json").write_text(json.dumps(summary, indent=1))
+    (RES / "summary.json").write_text(json.dumps(summary, indent=1), encoding="utf-8")
     from analysis import analyse
     analyse()
 

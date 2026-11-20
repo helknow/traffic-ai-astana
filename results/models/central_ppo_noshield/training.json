@@ -1,0 +1,187 @@
+{
+ "strategy": "central",
+ "algo": "ppo",
+ "shield": false,
+ "tag": "",
+ "sim_hours": 400.0,
+ "timesteps": 288000,
+ "minutes": 24.1,
+ "history": [
+  {
+   "sim_hours": 16,
+   "minutes": 1.1,
+   "avg_queue": 90.9,
+   "throughput_vph": 2521.0,
+   "max_red_wait_s": 319.0
+  },
+  {
+   "sim_hours": 32,
+   "minutes": 2.1,
+   "avg_queue": 80.9,
+   "throughput_vph": 2400.0,
+   "max_red_wait_s": 348.0
+  },
+  {
+   "sim_hours": 48,
+   "minutes": 3.1,
+   "avg_queue": 77.7,
+   "throughput_vph": 2550.0,
+   "max_red_wait_s": 324.0
+  },
+  {
+   "sim_hours": 64,
+   "minutes": 4.1,
+   "avg_queue": 70.3,
+   "throughput_vph": 2565.0,
+   "max_red_wait_s": 318.0
+  },
+  {
+   "sim_hours": 80,
+   "minutes": 5.2,
+   "avg_queue": 73.7,
+   "throughput_vph": 2643.0,
+   "max_red_wait_s": 345.0
+  },
+  {
+   "sim_hours": 96,
+   "minutes": 6.3,
+   "avg_queue": 72.3,
+   "throughput_vph": 2593.0,
+   "max_red_wait_s": 347.0
+  },
+  {
+   "sim_hours": 112,
+   "minutes": 7.2,
+   "avg_queue": 56.7,
+   "throughput_vph": 2312.0,
+   "max_red_wait_s": 365.0
+  },
+  {
+   "sim_hours": 128,
+   "minutes": 8.2,
+   "avg_queue": 65.9,
+   "throughput_vph": 2465.0,
+   "max_red_wait_s": 310.0
+  },
+  {
+   "sim_hours": 144,
+   "minutes": 9.1,
+   "avg_queue": 62.2,
+   "throughput_vph": 2576.0,
+   "max_red_wait_s": 318.0
+  },
+  {
+   "sim_hours": 160,
+   "minutes": 10.0,
+   "avg_queue": 61.1,
+   "throughput_vph": 2415.0,
+   "max_red_wait_s": 341.0
+  },
+  {
+   "sim_hours": 176,
+   "minutes": 10.9,
+   "avg_queue": 69.8,
+   "throughput_vph": 2646.0,
+   "max_red_wait_s": 373.0
+  },
+  {
+   "sim_hours": 192,
+   "minutes": 11.9,
+   "avg_queue": 55.4,
+   "throughput_vph": 2622.0,
+   "max_red_wait_s": 298.0
+  },
+  {
+   "sim_hours": 208,
+   "minutes": 12.8,
+   "avg_queue": 56.5,
+   "throughput_vph": 2637.0,
+   "max_red_wait_s": 307.0
+  },
+  {
+   "sim_hours": 224,
+   "minutes": 13.7,
+   "avg_queue": 57.7,
+   "throughput_vph": 2576.0,
+   "max_red_wait_s": 306.0
+  },
+  {
+   "sim_hours": 240,
+   "minutes": 14.7,
+   "avg_queue": 56.0,
+   "throughput_vph": 2324.0,
+   "max_red_wait_s": 325.0
+  },
+  {
+   "sim_hours": 256,
+   "minutes": 15.5,
+   "avg_queue": 50.1,
+   "throughput_vph": 2494.0,
+   "max_red_wait_s": 322.0
+  },
+  {
+   "sim_hours": 272,
+   "minutes": 16.4,
+   "avg_queue": 53.6,
+   "throughput_vph": 2460.0,
+   "max_red_wait_s": 341.0
+  },
+  {
+   "sim_hours": 288,
+   "minutes": 17.3,
+   "avg_queue": 48.5,
+   "throughput_vph": 2456.0,
+   "max_red_wait_s": 330.0
+  },
+  {
+   "sim_hours": 304,
+   "minutes": 18.2,
+   "avg_queue": 57.4,
+   "throughput_vph": 2619.0,
+   "max_red_wait_s": 344.0
+  },
+  {
+   "sim_hours": 320,
+   "minutes": 19.2,
+   "avg_queue": 55.3,
+   "throughput_vph": 2580.0,
+   "max_red_wait_s": 318.0
+  },
+  {
+   "sim_hours": 336,
+   "minutes": 20.2,
+   "avg_queue": 53.7,
+   "throughput_vph": 2561.0,
+   "max_red_wait_s": 316.0
+  },
+  {
+   "sim_hours": 352,
+   "minutes": 21.1,
+   "avg_queue": 59.2,
+   "throughput_vph": 2702.0,
+   "max_red_wait_s": 330.0
+  },
+  {
+   "sim_hours": 368,
+   "minutes": 22.1,
+   "avg_queue": 61.1,
+   "throughput_vph": 2686.0,
+   "max_red_wait_s": 372.0
+  },
+  {
+   "sim_hours": 384,
+   "minutes": 23.1,
+   "avg_queue": 50.1,
+   "throughput_vph": 2465.0,
+   "max_red_wait_s": 324.0
+  },
+  {
+   "sim_hours": 400,
+   "minutes": 24.0,
+   "avg_queue": 66.8,
+   "throughput_vph": 2879.0,
+   "max_red_wait_s": 320.0
+  }
+ ],
+ "worker_restarts": 0
+}

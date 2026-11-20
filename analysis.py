@@ -10,6 +10,7 @@ because a controller can look good by keeping cars out of the map.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -42,7 +43,7 @@ def overall(res: dict, c: str) -> dict:
 
 
 def analyse() -> dict:
-    data = json.loads((RES / "summary.json").read_text())
+    data = json.loads((RES / "summary.json").read_text(encoding="utf-8"))
     res = data["results"]
     ctrls = list(res)
     ov = {c: overall(res, c) for c in ctrls}
@@ -93,18 +94,45 @@ def analyse() -> dict:
             if k:
                 verdict.append(f"Your two strategies head to head: central wins {k['a_wins']} of {len(cells)} "
                                f"scenarios, independent wins {k['b_wins']}.")
+        k = h2h.get("independent|neighbour")
+        if k:
+            verdict.append(f"Independent vs neighbour-aware: independent wins {k['a_wins']} of {len(cells)} scenarios, "
+                           f"neighbour-aware {k['b_wins']}. Hearing the neighbours adds little on average here.")
         mp_ = ov.get("max_pressure")
         if mp_:
-            beat = [s for s in strategies if ov[strategies[s]["best"]]["time_loss_s"] < mp_["time_loss_s"]]
-            verdict.append("Against the best classic rule (max-pressure, no learning): " +
-                           (", ".join(LABEL[s] for s in beat) + " beat it." if beat else
-                            "no RL strategy beats it yet on this budget."))
+            m = mp_["time_loss_s"]
+            loss = {s: ov[strategies[s]["best"]]["time_loss_s"] for s in strategies}
+            beat = [s for s in strategies if loss[s] < 0.98 * m]          # within 2 % is a tie
+            tie = [s for s in strategies if abs(loss[s] - m) <= 0.02 * m]
+            text = (", ".join(LABEL[s] for s in beat) + " clearly beat it." if beat else
+                    "no RL strategy clearly beats it yet on this budget.")
+            if tie:
+                text += " " + ", ".join(f"{LABEL[s]} only ties it ({loss[s]:.0f} s vs {m:.0f} s)" for s in tie) + "."
+            verdict.append("Against the best classic rule (max-pressure, no learning): " + text)
+        if "central_ppo_long" in ov and "central_ppo" in ov:
+            a, b = ov["central_ppo"]["time_loss_s"], ov["central_ppo_long"]["time_loss_s"]
+            best = ov[top_c]["time_loss_s"]
+            verdict.append(f"Does the central brain only need more data? With 4× the training it loses {b:.0f} s "
+                           f"instead of {a:.0f} s ({100 * (b - a) / a:+.0f}%), still {100 * (b - best) / best:+.0f}% "
+                           f"behind the best strategy: the limit is the design (one model choosing 4^12 joint "
+                           f"actions from one shared reward), not the amount of data.")
+        for s, v in shield.items():
+            on, off = v["on"], v["off"]
+            verdict.append(f"Safety shield, {LABEL[s].lower()}: switched off, time lost goes {on['time_loss_s']:.0f} → "
+                           f"{off['time_loss_s']:.0f} s, longest standstill {on['max_red_wait_s']:.0f} → "
+                           f"{off['max_red_wait_s']:.0f} s, teleports {on['teleports']:.1f} → {off['teleports']:.1f}.")
+        algos = []
+        for s, v in strategies.items():
+            ranked = sorted(v["runs"], key=lambda c: v["runs"][c]["time_loss_s"])
+            algos.append(f"{LABEL[s].split(' ')[0].lower()}: " + " < ".join(
+                f"{ALGO[c.split('_')[1]]} {v['runs'][c]['time_loss_s']:.0f} s" for c in ranked))
+        verdict.append("Algorithms (time lost, lower is better): " + "; ".join(algos) + ".")
     out = {"labels": {c: label(c) for c in ctrls}, "overall": ov, "ranking": ranking, "strategies": strategies,
            "head_to_head": h2h, "per_season": per_season, "shield": shield, "verdict": verdict,
            "vs_fixed": {c: vs_fixed(c) for c in ctrls}, "training": training_info()}
-    (RES / "analysis.json").write_text(json.dumps(out, indent=1, ensure_ascii=False))
-    for line in verdict:
-        print("-", line)
+    (RES / "analysis.json").write_text(json.dumps(out, indent=1, ensure_ascii=False), encoding="utf-8")
+    for line in verdict:     # Windows consoles default to cp1251 here, which has no "×" or "→"
+        print("-", line.encode(sys.stdout.encoding or "utf-8", "replace").decode(sys.stdout.encoding or "utf-8"))
     return out
 
 
