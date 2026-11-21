@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Traffic AI · Astana strategy bench</title>
+<title>Traffic AI · Astana: which AI runs the lights best</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -33,23 +33,23 @@
     <span>Traffic AI <span class="brand-sub">Astana</span></span>
   </div>
   <nav class="tabs" role="tablist" aria-label="View">
-    <button role="tab" class="tab" aria-selected="true" data-view="race">Race</button>
+    <button role="tab" class="tab" aria-selected="true" data-view="race">Live race</button>
     <button role="tab" class="tab" aria-selected="false" data-view="results">Results</button>
   </nav>
   <div class="bar-controls" id="raceControls">
     <label class="select"><span class="sr">Season</span><select id="season"></select><svg class="icon"><use href="#i-chev"/></svg></label>
     <label class="select"><span class="sr">Time of day</span><select id="profile"></select><svg class="icon"><use href="#i-chev"/></svg></label>
-    <button class="switch" id="shield" role="switch" aria-checked="true" title="Safety shield for the learned controllers">
-      <svg class="icon"><use href="#i-shield"/></svg><span>Shield</span><i aria-hidden="true"></i>
+    <button class="switch" id="shield" role="switch" aria-checked="true" title="Safety rules: the AI may never make anyone wait more than about 90 seconds, and every road gets a turn at least every 4 minutes">
+      <svg class="icon"><use href="#i-shield"/></svg><span>Safety rules</span><i aria-hidden="true"></i>
     </button>
     <div class="seg" role="radiogroup" aria-label="Simulation speed" id="speed">
-      <button role="radio" aria-checked="false" data-v="1">1×</button>
-      <button role="radio" aria-checked="true" data-v="4">4×</button>
-      <button role="radio" aria-checked="false" data-v="10">10×</button>
-      <button role="radio" aria-checked="false" data-v="60">Max</button>
+      <button role="radio" aria-checked="false" data-v="1" title="Real time">1×</button>
+      <button role="radio" aria-checked="true" data-v="4" title="4 times faster than real life">4×</button>
+      <button role="radio" aria-checked="false" data-v="10" title="10 times faster than real life">10×</button>
+      <button role="radio" aria-checked="false" data-v="60" title="As fast as the computer can">Max</button>
     </div>
     <button class="btn ghost icon-only" id="pause" aria-label="Pause" disabled><svg class="icon"><use href="#i-pause"/></svg></button>
-    <button class="btn primary" id="run"><svg class="icon fill"><use href="#i-play"/></svg><span>Run</span></button>
+    <button class="btn primary" id="run"><svg class="icon fill"><use href="#i-play"/></svg><span>Start</span></button>
   </div>
 </header>
 
@@ -57,41 +57,41 @@
   <section class="left" aria-label="Race">
     <div class="clock-row">
       <span class="mono clock" id="clock">00:00</span>
-      <span class="scenario" id="scenarioLine">Pick the controllers, a season and a time of day, then press Run.</span>
+      <span class="scenario" id="scenarioLine">Choose a season and a time of day, then press Start.</span>
     </div>
 
     <div class="board-wrap">
-      <table class="board" aria-label="Live ranking by time lost per vehicle">
+      <table class="board" aria-label="Live ranking: the system whose cars lose the least time is first">
         <thead><tr>
           <th scope="col" class="c-rank">#</th>
-          <th scope="col" class="c-name">Controller</th>
-          <th scope="col" class="num" title="Average time lost per vehicle against free-flow driving">Time lost</th>
-          <th scope="col" class="num" title="Average time standing still per vehicle">Waiting</th>
-          <th scope="col" class="num" title="Vehicles halted at the 12 lights now">Queue</th>
-          <th scope="col" class="num" title="Vehicles that finished their trip, per hour">Throughput</th>
-          <th scope="col" class="num" title="Vehicles that could not even enter the map">Hidden queue</th>
+          <th scope="col" class="c-name">Traffic-light system</th>
+          <th scope="col" class="num" title="Extra time an average car needs compared with driving on empty roads. Lower is better.">Delay per car</th>
+          <th scope="col" class="num" title="How long an average car stands completely still. Lower is better.">Standing still</th>
+          <th scope="col" class="num" title="Cars stopped at the 12 lights right now. Lower is better.">Cars stopped</th>
+          <th scope="col" class="num" title="Cars that reached their destination, counted per hour. Higher is better.">Cars through</th>
+          <th scope="col" class="num" title="Cars waiting at the edge of the map because the streets are too full to let them in. Lower is better.">Can't get in</th>
         </tr></thead>
         <tbody id="board"></tbody>
       </table>
       <div class="board-empty" id="boardEmpty">
-        <p class="empty-title">Same hour, same events, up to four brains</p>
-        <p>Every controller below drives identical Astana traffic. The board re-ranks them as the hour unfolds; click a row to watch its streets.</p>
+        <p class="empty-title">Same streets, same cars, same accidents. Who handles it best?</p>
+        <p>Up to four traffic-light systems run exactly the same hour of Astana traffic side by side. The one whose cars lose the least time is on top. Click a row to watch that system on the map.</p>
       </div>
     </div>
 
     <section class="block">
-      <div class="block-head"><h3>In the race</h3><span class="hint">changes apply on Run</span></div>
+      <div class="block-head"><h3>Who is racing</h3><span class="hint">changes apply when you press Start</span></div>
       <div class="slots" id="slots"></div>
     </section>
 
     <section class="block">
-      <div class="block-head"><h3>Throw something at them</h3><span class="hint">hits every controller at the same second, same street</span></div>
+      <div class="block-head"><h3>Cause a problem on the road</h3><span class="hint">it happens to every system at once, on the same street</span></div>
       <div class="events" id="eventButtons"></div>
     </section>
 
     <section class="block log-block">
-      <div class="block-head"><h3>What happened</h3></div>
-      <ol class="log" id="log"><li class="log-empty">Scheduled accidents, breakdowns and jaywalkers for this season appear here, plus the ones you throw in.</li></ol>
+      <div class="block-head"><h3>What happened on the road</h3></div>
+      <ol class="log" id="log"><li class="log-empty">Accidents, breakdowns and people running across the road show up here, including the ones you cause.</li></ol>
     </section>
   </section>
 
@@ -100,20 +100,20 @@
       <header class="pane-head">
         <h2 id="mapTitle"><i class="sdot" id="mapDot"></i><span>Map</span></h2>
         <span class="chip" id="snowChip" hidden><svg class="icon"><use href="#i-snow"/></svg>Snowstorm</span>
-        <span class="pane-hint">Scroll to zoom · drag to pan · click a light</span>
-        <button class="btn ghost icon-only" id="fit" aria-label="Fit map" title="Fit map"><svg class="icon"><use href="#i-fit"/></svg></button>
+        <span class="pane-hint">Scroll to zoom · drag to move · click a light to see why it is green</span>
+        <button class="btn ghost icon-only" id="fit" aria-label="Show the whole map" title="Show the whole map"><svg class="icon"><use href="#i-fit"/></svg></button>
       </header>
       <canvas class="map" id="map" aria-label="Live map of the 12 traffic lights in central Astana"></canvas>
       <div class="legend" aria-hidden="true">
-        <span><i class="sw car"></i>Moving</span><span><i class="sw stop"></i>Waiting</span><span><i class="sw bus"></i>Bus</span>
-        <span><i class="sw risk"></i>Speeder / impaired</span><span><i class="sw crash"></i>Crashed</span><span><i class="sw ped"></i>Pedestrian</span>
+        <span><i class="sw car"></i>Moving</span><span><i class="sw stop"></i>Stopped</span><span><i class="sw bus"></i>Bus</span>
+        <span><i class="sw risk"></i>Speeding or drunk driver</span><span><i class="sw crash"></i>Crashed</span><span><i class="sw ped"></i>Person walking</span>
         <span class="gap"></span>
         <span><i class="sw sg"></i>Go</span><span><i class="sw sy"></i>Yellow</span><span><i class="sw sred"></i>Stop</span>
       </div>
     </div>
     <div class="detail" id="detail">
-      <div class="detail-head"><h3 id="dName">Click a light on the map</h3><span class="mono muted" id="dId"></span><span class="status" id="dStatus"></span></div>
-      <p class="reason" id="dReason">Its phases, queues and the reason behind its current green show here.</p>
+      <div class="detail-head"><h3 id="dName">Click a traffic light on the map</h3><span class="mono muted" id="dId"></span><span class="status" id="dStatus"></span></div>
+      <p class="reason" id="dReason">You will see which directions it lets go, how many cars and people are waiting, and why it shows green right now.</p>
       <ul class="phases" id="dPhases"></ul>
     </div>
   </section>

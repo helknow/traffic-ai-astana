@@ -10,12 +10,35 @@ const STRAT_VAR = (id) => {
   return `--s-${id}`;
 };
 const SLOT_KEYS = ["A", "B", "C", "D"];
+/* Plain names for everything shown on screen. Recorded races and old result files carry older
+   labels, so the page always names things from the id itself. */
+const NAME = { independent: "Independent AI", central: "Central AI", neighbour: "Neighbour AI",
+  fixed: "Fixed timer (today)", actuated: "Sensor timer", max_pressure: "Simple rule" };
+const WHAT = { independent: "each light decides alone", central: "one brain runs all 12 lights",
+  neighbour: "each light also hears its neighbours", fixed: "same cycle all day, like Astana now",
+  actuated: "green lasts longer while cars keep coming", max_pressure: "green goes to the longest queue, no AI" };
+const WHAT_SHORT = { independent: "each light alone", central: "one brain for all lights", neighbour: "lights share info",
+  fixed: "like Astana today", actuated: "reacts to sensors", max_pressure: "longest queue first" };
+const ALGO = { ppo: "PPO", a2c: "A2C", dqn: "DQN" };
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+function nameOf(id) {
+  if (NAME[id]) return NAME[id];
+  const p = id.split("_");
+  let s = `${NAME[p[0]] || p[0]} · ${ALGO[p[1]] || p[1]}`;
+  if (p.includes("noshield")) s += " · safety rules off";
+  if (p.includes("long")) s += " · 4× practice";
+  return s;
+}
+const kindOf = (id) => id.split("_")[0];
+const EVENT_TEXT = { accident: "Accident", breakdown: "Car broke down", jaywalker: "Person runs across",
+  impaired: "Drunk or high driver", ambulance: "Ambulance", snowstorm: "Snowstorm", roadworks: "Road works",
+  crash: "Crash (speeding or drunk driver)" };
 const REASON = {
-  ai: "the AI chose this phase", ai_keep: "the AI kept this phase", keep: "keeping green: people still coming",
-  rest_in_green: "resting in green: nobody waiting elsewhere", min_green: "minimum green (7 s) still running",
-  max_red_cap: "90 s cap: someone waited 90 s at a red", backstop_4min: "4-minute backstop: every direction gets a turn",
-  sensor_fallback: "camera trouble: fixed-time cycling", empty_green: "green road empty, handed to waiting traffic",
-  start: "starting up", fixed: "SUMO fixed-time plan (90 s cycle)", actuated: "SUMO actuated: gap-based extension",
+  ai: "the AI chose it", ai_keep: "the AI kept it green", keep: "cars are still coming, so it stays green",
+  rest_in_green: "nobody is waiting on the other roads, so it stays green", min_green: "every green lasts at least 7 seconds",
+  max_red_cap: "someone waited 90 seconds at a red, so it is their turn", backstop_4min: "4-minute rule: every direction gets a turn",
+  sensor_fallback: "a camera is broken, so the light runs on a fixed timer", empty_green: "this road was empty, so the green went to people waiting",
+  start: "starting up", fixed: "a fixed timer: the same 90-second cycle all day", actuated: "a sensor timer: the green lasts longer while cars keep coming",
 };
 const EVENT_ICON = { accident: "i-crash", breakdown: "i-wrench", jaywalker: "i-walk", impaired: "i-swerve",
   ambulance: "i-siren", snowstorm: "i-snow", roadworks: "i-cone" };
@@ -63,27 +86,28 @@ function defaultControllers() {
 
 function buildSlots() {
   const defs = defaultControllers();
-  const groups = [["Today and classic", c => c.kind === "baseline"],
-    ["Independent agents", c => c.kind === "independent"], ["Central brain + sub-agents", c => c.kind === "central"],
-    ["Neighbour-aware agents", c => c.kind === "neighbour"]];
-  const opt = (sel) => `<option value="">Empty slot</option>` + groups.map(([g, f]) => {
+  const groups = [["Without AI", c => c.kind === "baseline"],
+    ["Independent AI: each light decides alone", c => c.kind === "independent"],
+    ["Central AI: one brain runs all 12 lights", c => c.kind === "central"],
+    ["Neighbour AI: lights also hear their neighbours", c => c.kind === "neighbour"]];
+  const opt = (sel) => `<option value="">Nobody</option>` + groups.map(([g, f]) => {
     const items = state.opts.controllers.filter(f);
     return items.length ? `<optgroup label="${g}">${items.map(c => `<option value="${c.id}"${c.id === sel ? " selected" : ""}>${esc(c.label.replace(/^[^·]+· /, c.kind === "baseline" ? "" : ""))}</option>`).join("")}</optgroup>` : "";
   }).join("");
   $("#slots").innerHTML = SLOT_KEYS.map((k, i) => `
     <div class="slot"><span class="key">${k}</span>
-      <label class="select"><span class="sr">Controller ${k}</span><select data-slot="${i}">${opt(defs[i] || "")}</select><svg class="icon"><use href="#i-chev"/></svg></label>
+      <label class="select"><span class="sr">Racer ${k}</span><select data-slot="${i}">${opt(defs[i] || "")}</select><svg class="icon"><use href="#i-chev"/></svg></label>
     </div>`).join("");
   // full labels inside optgroups read better than the trimmed ones
   $$("#slots select").forEach(sel => $$("option", sel).forEach(o => {
     const c = state.opts.controllers.find(x => x.id === o.value);
-    if (c) o.textContent = c.label.replace(" with sub-agents", "").replace(" agents", "");
+    if (c) o.textContent = nameOf(c.id);
   }));
 }
 
 function buildEvents() {
   $("#eventButtons").innerHTML = state.opts.events.map(e =>
-    `<button class="btn ghost" data-event="${e.id}" disabled><svg class="icon"><use href="#${EVENT_ICON[e.id]}"/></svg>${esc(e.label)}</button>`).join("");
+    `<button class="btn ghost" data-event="${e.id}" disabled><svg class="icon"><use href="#${EVENT_ICON[e.id]}"/></svg>${esc(EVENT_TEXT[e.id] || e.label)}</button>`).join("");
 }
 
 function wire() {
@@ -104,13 +128,13 @@ function wire() {
   $("#shield").addEventListener("click", () => {
     const on = $("#shield").getAttribute("aria-checked") !== "true";
     $("#shield").setAttribute("aria-checked", on);
-    toast(on ? "Shield on for the learned controllers. Press Run to apply." : "Shield off: raw RL decides (only minimum green and clearance stay). Press Run to apply.");
+    toast(on ? "Safety rules on: the AI can never make anyone wait too long. Press Start to apply." : "Safety rules off: the AI decides alone; only the 7-second minimum green and the safe yellow and red change-over stay. Press Start to apply.");
   });
   $("#eventButtons").addEventListener("click", (e) => {
     const b = e.target.closest("[data-event]");
     if (!b || !state.running) return;
     send({ cmd: "event", kind: b.dataset.event });
-    toast(`${b.textContent.trim()}: sent to every controller at the same second`);
+    toast(`${b.textContent.trim()}: happening to every system at the same moment`);
   });
   $("#board").addEventListener("click", (e) => {
     const tr = e.target.closest("tr[data-i]");
@@ -154,7 +178,7 @@ function send(m) {
 
 function start() {
   const controllers = $$("#slots select").map(s => s.value).filter(Boolean);
-  if (!controllers.length) { toast("Pick at least one controller"); return; }
+  if (!controllers.length) { toast("Choose at least one system to race"); return; }
   state.starting = true;
   $("#run").disabled = true;
   $("#run span").textContent = "Starting…";
@@ -162,7 +186,7 @@ function start() {
   state.selected = 0; state.prevVeh.clear(); state.curVeh.clear();
   const season = state.opts.seasons.find(s => s.id === $("#season").value);
   const profile = state.opts.profiles.find(p => p.id === $("#profile").value);
-  $("#scenarioLine").innerHTML = `<b>${esc(season.title)}</b>, ${esc(profile.title.toLowerCase())}, warming up the streets…`;
+  $("#scenarioLine").innerHTML = `<b>${esc(season.title)}</b>, ${esc(profile.title.toLowerCase())}: filling the streets with cars…`;
   send({ cmd: "start", controllers, season: season.id, profile: profile.id, seed: 101,
     shield: $("#shield").getAttribute("aria-checked") === "true" });
   send({ cmd: "speed", value: state.speed });
@@ -173,7 +197,7 @@ function setRunning(on) {
   $("#pause").disabled = !on;
   $$("#eventButtons button").forEach(b => b.disabled = !on);
   $("#run").disabled = false;
-  $("#run span").textContent = on ? "Restart" : "Run";
+  $("#run span").textContent = on ? "Start again" : "Start";
 }
 
 function onMessage(m) {
@@ -185,7 +209,7 @@ function onMessage(m) {
   } else if (m.type === "error") {
     state.starting = false; setRunning(false);
     toast(`Could not start: ${m.message}`);
-    $("#scenarioLine").textContent = "The simulation did not start. Check the server window for details.";
+    $("#scenarioLine").textContent = "The race did not start. Check the server window for the reason, then press Start again.";
   } else if (m.type === "frame") {
     const now = performance.now();
     if (state.frame) state.frameGap = Math.min(1200, Math.max(16, now - state.frameAt));
@@ -196,7 +220,7 @@ function onMessage(m) {
     renderBoard();
     renderLog(m.log);
     renderDetail();
-    if (m.done) { setRunning(false); $("#run span").textContent = "Run again"; toast(STATIC ? "End of the recording. The Results tab has the full comparison." : "The hour is over. Results tab has the averaged comparison."); }
+    if (m.done) { setRunning(false); $("#run span").textContent = "Start again"; toast(STATIC ? "End of the recording. The Results tab has the full comparison." : "The hour is over. The Results tab has the full comparison."); }
   }
 }
 
@@ -242,12 +266,11 @@ function renderBoard() {
     const isLit = lit && lit.until > now;
     tr.className = isLit ? "lit" : "";
     tr.setAttribute("aria-selected", r.i === state.selected);
-    const kind = (state.opts.controllers.find(c => c.id === r.id) || {}).kind || "baseline";
-    const parts = r.label.split(" · ");
-    const name = kind === "baseline" ? r.label : parts[0].replace(" agents", "").replace(" with sub-agents", "");
-    const sub = kind === "baseline" ? (r.id === "fixed" ? "Astana today" : "classic rule") : parts.slice(1).join(" · ");
+    const label = nameOf(r.id);
+    const name = label.split(" · ")[0];
+    const sub = [label.split(" · ").slice(1).join(" · "), WHAT_SHORT[kindOf(r.id)]].filter(Boolean).join(" · ");
     const k1 = r.kpi;
-    const gap = k > 0 && bestLoss > 0 ? `<span class="lead">+${Math.round(100 * (k1.loss - bestLoss) / bestLoss)}%</span>` : `<span class="lead">${r.done ? "finished" : "leading"}</span>`;
+    const gap = k > 0 && bestLoss > 0 ? `<span class="lead">${Math.round(100 * (k1.loss - bestLoss) / bestLoss)}% slower</span>` : `<span class="lead">${r.done ? "finished first" : "best so far"}</span>`;
     tr.innerHTML = `
       <td><span class="rank${isLit ? " " + lit.dir : ""}">${k + 1}${isLit ? `<svg class="icon"><use href="#i-${lit.dir}"/></svg>` : ""}</span></td>
       <td><div class="cname"><i class="sdot" style="background:var(${STRAT_VAR(r.id)})"></i><div><b>${esc(name)}</b><small>${esc(SLOT_KEYS[r.i])} · ${esc(sub)}</small></div></div></td>
@@ -269,7 +292,7 @@ function renderBoard() {
   state.lastRank = rankOf;
   const sel = runs[state.selected];
   if (sel) {
-    $("#mapTitle span").textContent = sel.label;
+    $("#mapTitle span").textContent = nameOf(sel.id);
     $("#mapDot").style.background = `var(${STRAT_VAR(sel.id)})`;
     $("#snowChip").hidden = !sel.snow;
   }
@@ -280,8 +303,8 @@ function renderLog(items) {
   const run = state.frame.runs[state.selected];
   const auto = (run && run.events) ? run.events.filter(e => !items.some(x => x.kind === e.kind && Math.abs(x.t - state.frame.t) < 3)) : [];
   if (!items.length && !auto.length) return;
-  const rows = items.map(x => `<li><span class="t">${clock(x.t)}</span><span class="pill you">${esc(x.label)}</span><span class="where">${x.street ? esc(x.street) + " · " : ""}${STATIC ? "scripted, all four at once" : "thrown in by you"}</span></li>`);
-  const live = auto.map(e => `<li><span class="t">now</span><span class="pill">${esc(e.label)}</span><span class="where">${e.left ? `clears in ${Math.ceil(e.left / 60)} min` : "under way"}${e.note ? " · " + esc(e.note) : ""}</span></li>`);
+  const rows = items.map(x => `<li><span class="t">${clock(x.t)}</span><span class="pill you">${esc(EVENT_TEXT[x.kind] || x.label)}</span><span class="where">${x.street ? esc(x.street) + " · " : ""}${STATIC ? "happened to all four at once" : "caused by you"}</span></li>`);
+  const live = auto.map(e => `<li><span class="t">now</span><span class="pill">${esc(EVENT_TEXT[e.kind] || e.label)}</span><span class="where">${e.left ? `cleared in ${Math.ceil(e.left / 60)} min` : "still going on"}${e.note ? " · " + esc(e.note) : ""}</span></li>`);
   ol.innerHTML = live.concat(rows).join("");
 }
 
@@ -296,16 +319,17 @@ function renderDetail() {
   $("#dName").textContent = L.name;
   $("#dId").textContent = L.id;
   const st = $("#dStatus");
-  st.textContent = d.ok ? "" : "camera trouble";
+  st.textContent = d.ok ? "" : "camera broken";
   st.className = "status" + (d.ok ? "" : " bad");
   const r = REASON[d.r] || d.r;
-  $("#dReason").innerHTML = d.p === null ? `Run by <b>${esc(r)}</b>. Phases and queues are measured, not controlled.` :
-    `Now: <b>${esc(r)}</b>${d.st && d.st !== "green" ? ` · changing (${esc(d.st.replace("_", " "))})` : ""}.`;
+  const STAGE = { yellow: "yellow", all_red: "all red for a moment, for safety", ped_clear: "letting people finish crossing" };
+  $("#dReason").innerHTML = d.p === null ? `This light runs on <b>${esc(r)}</b>. The numbers below are only measured.` :
+    `Green right now because <b>${esc(r)}</b>${d.st && d.st !== "green" ? `. Switching: ${esc(STAGE[d.st] || d.st)}` : ""}.`;
   const maxq = Math.max(8, ...d.q.map((q, k) => q + (d.pd[k] || 0)));
   $("#dPhases").innerHTML = L.phases.map((p, k) => `
-    <li class="${d.p === k ? "on" : ""}"><span class="pn">${p.kind === "left" ? "left turn" : "phase " + (k + 1)}</span>
-      <span class="bars" title="cars queued and people waiting"><i class="q" style="width:${100 * d.q[k] / maxq}%"></i><i class="p" style="width:${100 * (d.pd[k] || 0) / maxq}%"></i></span>
-      <span class="nums">${d.q[k]} cars · ${d.pd[k] || 0} ppl · ${d.w[k]}s</span></li>`).join("");
+    <li class="${d.p === k ? "on" : ""}"><span class="pn">${p.kind === "left" ? "left-turn green" : "green " + (k + 1)}</span>
+      <span class="bars" title="cars stopped and people waiting for this green"><i class="q" style="width:${100 * d.q[k] / maxq}%"></i><i class="p" style="width:${100 * (d.pd[k] || 0) / maxq}%"></i></span>
+      <span class="nums">${plural(d.q[k], "car", "cars")} · ${plural(d.pd[k] || 0, "person", "people")} · longest wait ${d.w[k]} s</span></li>`).join("");
 }
 
 /* ---------------- map ---------------- */
@@ -482,7 +506,7 @@ const map = {
     if (!f) {
       c.fillStyle = "rgba(8,9,10,.55)"; c.fillRect(0, 0, this.w, this.h);
       c.fillStyle = "#8a8f98"; c.font = "400 13px Inter, sans-serif"; c.textAlign = "center";
-      c.fillText("12 traffic lights, central Astana · press Run to start the hour", this.w / 2, this.h / 2);
+      c.fillText("12 traffic lights in central Astana · press Start", this.w / 2, this.h / 2);
     }
   },
 };
@@ -490,10 +514,18 @@ function roundRect(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcT
 
 /* ---------------- results ---------------- */
 const COLS = [
-  ["time_loss_s", "Time lost", "s", 0], ["avg_wait_s", "Waiting", "s", 0], ["avg_travel_s", "Travel time", "s", 0],
-  ["avg_queue", "Queue", "", 1], ["throughput_vph", "Throughput", "/h", 0], ["arrived", "Arrived", "", 0],
-  ["teleports", "Teleports", "", 1], ["backlog_end", "Hidden queue", "", 0], ["max_red_wait_s", "Longest standstill", "s", 0],
-  ["ped_loss_s", "Pedestrian loss", "s", 0], ["co2_kg", "CO₂", "kg", 0], ["ambulance_s", "Ambulance crossing", "s", 0],
+  ["time_loss_s", "Delay per car", "s", 0, "Extra time an average car needs compared with empty roads. The main score."],
+  ["avg_wait_s", "Standing still", "s", 0, "How long an average car stands completely still."],
+  ["avg_travel_s", "Trip time", "s", 0, "How long an average trip through the centre takes."],
+  ["avg_queue", "Cars stopped", "", 1, "Cars stopped at the 12 lights, on average."],
+  ["throughput_vph", "Cars through", "/h", 0, "Cars that reached their destination per hour. Higher is better."],
+  ["arrived", "Trips finished", "", 0, "Trips finished in the hour. The same number as cars through, because each test lasts one hour."],
+  ["teleports", "Stuck cars removed", "", 1, "Cars so stuck in a jam that the simulator had to remove them. A sign of gridlock."],
+  ["backlog_end", "Can't get in", "", 0, "Cars still waiting at the edge of the map at the end of the hour because the streets were too full."],
+  ["max_red_wait_s", "Longest wait", "s", 0, "The longest any single car stood still at a light in the hour (averaged over the tests)."],
+  ["ped_loss_s", "Delay per walker", "s", 0, "Extra time an average person on foot loses, mostly waiting to cross."],
+  ["co2_kg", "CO₂", "kg", 0, "Exhaust gas from all cars in the hour. Less stopping means less CO₂."],
+  ["ambulance_s", "Ambulance trip", "s", 0, "How long an ambulance needs to cross the centre."],
 ];
 const HIGHER_BETTER = new Set(["throughput_vph", "arrived"]);
 
@@ -510,24 +542,25 @@ const results = {
   render() {
     const R = state.results, box = $("#resultsBody");
     if (!R.available || !R.analysis) {
-      box.innerHTML = `<h1>Strategy comparison</h1><p class="empty-results">No evaluation yet. Train the strategies (<code>train_all.sh</code>) and run <code>python evaluate.py</code>; this page then shows every metric for every controller, season by season, with the written verdict.</p>${fixesCard()}`;
+      box.innerHTML = `<h1>Which system works best?</h1><p class="empty-results">No test results yet. Train the AIs (<code>train_all.sh</code>), then run <code>python evaluate.py</code>. This page then shows every number for every system, season by season, with a written answer.</p>${fixesCard()}`;
       return;
     }
     const A = R.analysis, S = R.summary;
     const ctrls = Object.keys(A.overall);
     box.innerHTML = `
-      <div><h1>Which strategy should we build on?</h1>
-      <p class="lede">${ctrls.length} controllers, each driven through ${S.seasons.length} seasons × ${S.profiles.length} times of day × ${S.seeds} days of traffic the AI never trained on, with the same accidents, breakdowns, jaywalkers and snowstorms for every controller.</p></div>
-      <section class="card"><h2>Verdict</h2><div class="verdict">${A.verdict.map(v => `<p>${esc(v)}</p>`).join("")}</div></section>
-      <section class="card"><h2>Every metric, every controller</h2><p class="sub">Averaged over all scenarios. Click a column to sort. The best value per column is underlined; the last column compares time lost with today's fixed timers.</p>
+      <div><h1>Which system works best?</h1>
+      <p class="lede">We tested ${ctrls.length} traffic-light systems on ${S.seasons.length * S.profiles.length * S.seeds} hours of traffic each: ${S.seasons.length} seasons × ${S.profiles.length} times of day × ${S.seeds} different days the AI never saw while learning. Every system got the same accidents, breakdowns, people running across and snowstorms.</p></div>
+      <section class="card"><h2>The answer</h2><div class="verdict">${A.verdict.map(v => `<p>${esc(v)}</p>`).join("")}</div></section>
+      ${readCard()}
+      <section class="card"><h2>All the numbers</h2><p class="sub">Averages over all ${S.seasons.length * S.profiles.length * S.seeds} test hours. Hover a column name to see what it means, click it to sort. The best value in each column is underlined. The last column compares the delay with today's fixed timers.</p>
         <div class="rtable-wrap" id="rtable"></div></section>
       <div class="grid2">
-        <section class="card"><h2>Time lost by season</h2><p class="sub">Best run of each strategy against the classic controllers. Winter's snow and ice is where control matters most.</p><div id="seasonChart"></div></section>
-        <section class="card"><h2>Head to head</h2><p class="sub">Scenarios won on time lost (16 = 4 seasons × 4 times of day), best algorithm of each strategy.</p><div id="h2h"></div></section>
+        <section class="card"><h2>Delay per car in each season</h2><p class="sub">The best version of each AI next to the systems without AI. Winter snow and ice is where good control matters most.</p><div id="seasonChart"></div></section>
+        <section class="card"><h2>Who wins more often</h2><p class="sub">Out of 16 situations (4 seasons × 4 times of day), how often each AI had less delay than the other.</p><div id="h2h"></div></section>
       </div>
       <div class="grid2">
-        <section class="card"><h2>What the shield costs</h2><p class="sub">Same strategy and algorithm (PPO), trained and tested with the safety shield on and off.</p><div id="shieldT"></div></section>
-        <section class="card"><h2>Learning curves</h2><p class="sub">Average queue during training against simulated hours of traffic, every strategy on the same budget.</p><div id="trainChart"></div></section>
+        <section class="card"><h2>What the safety rules cost</h2><p class="sub">The same AI, trained and tested with the safety rules on and off.</p><div id="shieldT"></div></section>
+        <section class="card"><h2>How the AIs learned</h2><p class="sub">Cars stopped during practice, against hours of practice traffic. Going down means the AI is getting better. Every AI got the same amount of practice.</p><div id="trainChart"></div></section>
       </div>
       ${fixesCard()}`;
     this.table(A); this.seasonChart(A, S); this.h2h(A); this.shield(A); this.train(A);
@@ -544,11 +577,11 @@ const results = {
       const vals = ctrls.map(c => A.overall[c][k]).filter(v => v !== null && v !== undefined);
       if (vals.length) best[k] = HIGHER_BETTER.has(k) ? Math.max(...vals) : Math.min(...vals);
     }
-    const head = `<tr><th data-k="name">Controller</th>${COLS.map(([k, t]) => `<th data-k="${k}"${k === this.sortKey ? ` aria-sort="${this.sortDir > 0 ? "ascending" : "descending"}"` : ""}>${t}</th>`).join("")}<th>vs fixed</th></tr>`;
+    const head = `<tr><th data-k="name">Traffic-light system</th>${COLS.map(([k, t, , , tip]) => `<th data-k="${k}" title="${esc(tip)}"${k === this.sortKey ? ` aria-sort="${this.sortDir > 0 ? "ascending" : "descending"}"` : ""}>${t}</th>`).join("")}<th title="Delay per car compared with today's fixed timers">vs today</th></tr>`;
     const body = rows.map(c => {
       const o = A.overall[c];
       const vf = A.vs_fixed[c];
-      return `<tr><td><div class="cname"><i class="sdot" style="background:var(${STRAT_VAR(c)})"></i>${esc(A.labels[c])}</div></td>${COLS.map(([k, , u, d]) => {
+      return `<tr><td><div class="cname"><i class="sdot" style="background:var(${STRAT_VAR(c)})"></i>${esc(nameOf(c))}</div></td>${COLS.map(([k, , u, d]) => {
         const v = o[k];
         if (v === null || v === undefined) return `<td class="muted">–</td>`;
         return `<td class="${v === best[k] ? "best" : ""}">${(+v).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d })}${u ? `<span class="unit">${u}</span>` : ""}</td>`;
@@ -566,7 +599,7 @@ const results = {
     const W = 600, H = 250, L = 38, B = 28, T = 10;
     const max = Math.max(...S.seasons.flatMap(se => series.map(c => A.per_season[se][c]))) * 1.08;
     const gw = (W - L) / S.seasons.length, bw = Math.min(18, (gw - 18) / series.length);
-    let out = `<svg class="chart" viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="Time lost per vehicle by season">`;
+    let out = `<svg class="chart" viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="Delay per car in each season">`;
     for (let k = 0; k <= 4; k++) {
       const v = max * k / 4, y = H - B - (H - B - T) * k / 4;
       out += `<line x1="${L}" x2="${W}" y1="${y}" y2="${y}" stroke="#23252a"/><text class="tick" x="${L - 6}" y="${y + 3}" text-anchor="end">${Math.round(v)}</text>`;
@@ -575,64 +608,76 @@ const results = {
       const x0 = L + gi * gw + (gw - bw * series.length) / 2;
       series.forEach((c, si) => {
         const v = A.per_season[se][c], h = (H - B - T) * v / max;
-        out += `<rect x="${x0 + si * bw + 1}" y="${H - B - h}" width="${bw - 2}" height="${h}" rx="2" fill="var(${STRAT_VAR(c)})"><title>${esc(A.labels[c])}: ${v} s</title></rect>`;
+        out += `<rect x="${x0 + si * bw + 1}" y="${H - B - h}" width="${bw - 2}" height="${h}" rx="2" fill="var(${STRAT_VAR(c)})"><title>${esc(nameOf(c))}: ${v} s</title></rect>`;
       });
       const title = state.opts.seasons.find(s => s.id === se)?.title || se;
       out += `<text x="${L + gi * gw + gw / 2}" y="${H - 8}" text-anchor="middle">${esc(title)}</text>`;
     });
-    out += `</svg><div class="legend-row">${series.map(c => `<span><i class="sdot" style="background:var(${STRAT_VAR(c)})"></i>${esc(A.labels[c])}</span>`).join("")}</div>`;
+    out += `</svg><div class="legend-row">${series.map(c => `<span><i class="sdot" style="background:var(${STRAT_VAR(c)})"></i>${esc(nameOf(c))}</span>`).join("")}</div>`;
     $("#seasonChart").innerHTML = out;
   },
   h2h(A) {
     const rows = Object.values(A.head_to_head);
-    if (!rows.length) { $("#h2h").innerHTML = `<p class="muted">Needs at least two trained strategies.</p>`; return; }
-    const name = (s) => ({ independent: "Independent", central: "Central brain", neighbour: "Neighbour-aware" })[s];
+    if (!rows.length) { $("#h2h").innerHTML = `<p class="muted">Needs at least two trained AIs.</p>`; return; }
+    const name = (s) => NAME[s];
     $("#h2h").innerHTML = `<table class="rtable"><tr><th>Match</th><th>Wins</th><th>Wins</th></tr>${rows.map(r =>
       `<tr><td>${name(r.a)} vs ${name(r.b)}</td><td class="${r.a_wins > r.b_wins ? "best" : ""}">${name(r.a)} ${r.a_wins}</td><td class="${r.b_wins > r.a_wins ? "best" : ""}">${name(r.b)} ${r.b_wins}</td></tr>`).join("")}</table>`;
   },
   shield(A) {
     const s = A.shield;
     if (!Object.keys(s).length) { $("#shieldT").innerHTML = `<p class="muted">Train the <code>--no-shield</code> runs to compare.</p>`; return; }
-    const keys = [["time_loss_s", "Time lost", "s"], ["max_red_wait_s", "Longest standstill", "s"], ["ped_loss_s", "Pedestrian loss", "s"], ["teleports", "Teleports", ""]];
-    const name = (x) => ({ independent: "Independent", central: "Central brain", neighbour: "Neighbour-aware" })[x];
-    $("#shieldT").innerHTML = `<table class="rtable"><tr><th>Strategy</th>${keys.map(([, t]) => `<th>${t} on / off</th>`).join("")}</tr>${Object.entries(s).map(([k, v]) =>
+    const keys = [["time_loss_s", "Delay per car", "s"], ["max_red_wait_s", "Longest wait", "s"], ["ped_loss_s", "Delay per walker", "s"], ["teleports", "Stuck cars removed", ""]];
+    const name = (x) => NAME[x];
+    $("#shieldT").innerHTML = `<table class="rtable"><tr><th>AI</th>${keys.map(([, t]) => `<th>${t}<br><span class="muted">on / off</span></th>`).join("")}</tr>${Object.entries(s).map(([k, v]) =>
       `<tr><td>${name(k)}</td>${keys.map(([m, , u]) => `<td>${fmt(v.on[m])} / ${fmt(v.off[m])}${u ? `<span class="unit">${u}</span>` : ""}</td>`).join("")}</tr>`).join("")}</table>`;
   },
   train(A) {
     const runs = Object.entries(A.training).filter(([, v]) => v.history && v.history.length);
-    if (!runs.length) { $("#trainChart").innerHTML = `<p class="muted">No training history yet.</p>`; return; }
+    if (!runs.length) { $("#trainChart").innerHTML = `<p class="muted">No practice history yet.</p>`; return; }
     const W = 520, H = 240, L = 34, B = 26, T = 10;
     const xmax = Math.max(...runs.flatMap(([, v]) => v.history.map(h => h.sim_hours)));
     const ys = runs.flatMap(([, v]) => v.history.map(h => h.avg_queue));
     const ymin = Math.min(...ys) * 0.95, ymax = Math.max(...ys) * 1.05;
     const X = (x) => L + (W - L - 8) * x / xmax, Y = (y) => H - B - (H - B - T) * (y - ymin) / (ymax - ymin);
-    let out = `<svg class="chart" viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="Training curves">`;
+    let out = `<svg class="chart" viewBox="0 0 ${W} ${H + 4}" role="img" aria-label="How the AIs learned">`;
     for (let k = 0; k <= 3; k++) { const y = ymin + (ymax - ymin) * k / 3; out += `<line x1="${L}" x2="${W}" y1="${Y(y)}" y2="${Y(y)}" stroke="#23252a"/><text class="tick" x="${L - 6}" y="${Y(y) + 3}" text-anchor="end">${Math.round(y)}</text>`; }
     for (let k = 0; k <= 4; k++) { const x = xmax * k / 4; out += `<text class="tick" x="${X(x)}" y="${H - 8}" text-anchor="middle">${Math.round(x)} h</text>`; }
     for (const [id, v] of runs) {
       const dash = id.includes("a2c") ? "4 3" : id.includes("dqn") ? "1 3" : "";
-      out += `<polyline fill="none" stroke="var(${STRAT_VAR(id)})" stroke-width="1.6" ${dash ? `stroke-dasharray="${dash}"` : ""} stroke-linejoin="round" points="${v.history.map(h => `${X(h.sim_hours)},${Y(h.avg_queue)}`).join(" ")}"><title>${esc(A.labels[id] || id)}</title></polyline>`;
+      out += `<polyline fill="none" stroke="var(${STRAT_VAR(id)})" stroke-width="1.6" ${dash ? `stroke-dasharray="${dash}"` : ""} stroke-linejoin="round" points="${v.history.map(h => `${X(h.sim_hours)},${Y(h.avg_queue)}`).join(" ")}"><title>${esc(nameOf(id))}</title></polyline>`;
     }
-    out += `</svg><div class="legend-row"><span><i class="sdot" style="background:var(--s-independent)"></i>Independent</span><span><i class="sdot" style="background:var(--s-central)"></i>Central brain</span><span><i class="sdot" style="background:var(--s-neighbour)"></i>Neighbour-aware</span><span>solid PPO · dashed A2C · dotted DQN</span></div>`;
+    out += `</svg><div class="legend-row"><span><i class="sdot" style="background:var(--s-independent)"></i>Independent AI</span><span><i class="sdot" style="background:var(--s-central)"></i>Central AI</span><span><i class="sdot" style="background:var(--s-neighbour)"></i>Neighbour AI</span><span>line style = learning method: solid PPO, dashed A2C, dotted DQN</span></div>`;
     $("#trainChart").innerHTML = out;
   },
 };
 const fmt = (v) => v === null || v === undefined ? "–" : (+v).toLocaleString("en-US", { maximumFractionDigits: 0 });
 
-function fixesCard() {
-  return `<section class="card"><h2>What we changed in the plan, and why</h2><p class="sub">Problems found while building and testing. Each would have made the comparison wrong or the training fail.</p>
+function readCard() {
+  return `<section class="card"><h2>How to read this</h2><p class="sub">Three kinds of AI were tested against three systems without AI.</p>
   <ul class="fixes">
-    <li><b>“Accumulated” waiting time</b><p>A running total of waiting since the start only ever grows, so the reward drifts with the clock instead of the lights' choices. We use the waiting of the cars standing at the light <em>now</em>, with SUMO's waiting memory raised from 100 s to 1000 s so long waits stay visible.</p></li>
-    <li><b>Units out of balance</b><p>Queue counts cars, waiting counts seconds: with β = 0.1 the waiting term still outweighed the queue about 3 to 1 in rush hour. Waiting is now in minutes, and the total is scaled so rewards stay in a range PPO handles.</p></li>
-    <li><b>Teleports looked like success</b><p>When SUMO removes a gridlocked car, it stops counting in queue and waiting, so a controller could “win” by causing gridlock. Each teleport is now a penalty, and teleports are reported.</p></li>
-    <li><b>Cars that never got in</b><p>A controller that blocks the map's entrances shrinks its own queue while cars pile up outside. That hidden queue is now a reward penalty and a reported metric.</p></li>
-    <li><b>Pedestrians were invisible</b><p>The formula only counted vehicles. People waiting at crosswalks are added (δ = 0.5), and the safety shield keeps them from being starved.</p></li>
-    <li><b>D overlaps Q</b><p>“Delayed vehicles” is almost the same signal as the queue. Kept at γ = 0.1 as your partner wrote, but it adds little; dropping it is a safe simplification.</p></li>
-    <li><b>Throughput = arrived</b><p>Two names for one number over a fixed hour. Both are shown, but they always agree.</p></li>
-    <li><b>Fair comparison</b><p>Same traffic, same events and new seeds for every controller, and every strategy gets the same budget of simulated hours. The central brain collects 1 training sample per decision against 12 for the per-light agents, so we also trained it with 4× the budget to see whether it just needs more data.</p></li>
-    <li><b>DQN and the central brain</b><p>A central DQN would have to score 4¹² ≈ 16.8 million joint actions. It cannot, so DQN runs for the per-light strategies only; PPO and A2C run for all three.</p></li>
-    <li><b>Bugs found in the simulator</b><p>SUMO activated the last-loaded (actuated) plan, so the “fixed timer” was secretly actuated; speeders with a 0.8 s gap crashed and got teleported; parallel training workers raced on the same traffic file; crashed cars counted as “waiting”, which pulled the 90 s rule toward blocked roads; SUMO's ambulance blue-light device crashed the simulator mid-training. All fixed and re-tested before training.</p></li>
-    <li><b>Found in the results</b><p>The first evaluation showed cars standing 5–7 minutes at J07 even on green. The OSM import had made Zhangeldin give way to a 45 m slip road 8 m past the light, so the light's exit kept freezing; two such spots now give the main street right of way. Cars stuck behind a broken-down car also counted as waiting for the light, sending the 90 s rule's green to a lane nobody could drive on. Both fixed, then everything was evaluated again.</p></li>
+    <li><b>Independent AI</b><p>Every traffic light has its own small AI that only sees the cars and people at its own crossing. Idea 1 from the plan.</p></li>
+    <li><b>Central AI</b><p>A helper at every light reports what it sees to one big AI, which then sets all 12 lights at once. Idea 2 from the plan.</p></li>
+    <li><b>Neighbour AI</b><p>Like the independent AI, but each light also hears a short summary from the lights next to it. We added it to check whether lights should talk to each other.</p></li>
+    <li><b>Without AI</b><p><em>Fixed timer</em>: the same cycle all day, like most Astana lights now. <em>Sensor timer</em>: the green lasts longer while cars keep coming. <em>Simple rule</em> (max-pressure): the green always goes to the longest queue.</p></li>
+    <li><b>PPO, A2C, DQN</b><p>Three different learning methods. Each AI was trained with each method on the same amount of practice, so we can see which method learns best.</p></li>
+    <li><b>Safety rules</b><p>Hard rules the AI cannot break: nobody waits much more than 90 seconds, every road gets a turn at least every 4 minutes, and if a camera breaks the light falls back to a fixed timer.</p></li>
+    <li><b>Delay per car</b><p>The main score: how much extra time an average car needs compared with driving on empty roads. Lower is better.</p></li>
+  </ul></section>`;
+}
+
+function fixesCard() {
+  return `<section class="card"><h2>What we changed in the plan, and why</h2><p class="sub">Problems we found while building and testing. Each one would have made the comparison wrong or stopped the training.</p>
+  <ul class="fixes">
+    <li><b>Waiting time kept growing</b><p>The plan counted all waiting since the start of the hour, so the score got worse with the clock even when the lights did well. Now it counts the waiting of the cars standing at the light right now.</p></li>
+    <li><b>Seconds outweighed cars</b><p>Waiting was measured in seconds and the queue in cars, so waiting counted about three times more than it should. Waiting is now in minutes, and the whole score is scaled down so the AI can learn from it.</p></li>
+    <li><b>Gridlock looked like success</b><p>When cars get totally stuck, the simulator removes them, and the queue suddenly looks shorter. Now every removed car costs points and is reported.</p></li>
+    <li><b>Cars that never got in</b><p>An AI could keep its own queue short by not letting new cars into the centre. Cars waiting at the edge of the map now cost points too.</p></li>
+    <li><b>People on foot were missing</b><p>The plan only counted cars. People waiting to cross now count as well, and the safety rules make sure they always get a turn.</p></li>
+    <li><b>Two numbers that say the same thing</b><p>"Delayed cars" is almost the same as the queue, and "throughput" is the same number as "arrived cars" in a one-hour test. We kept them, as in the plan, but they add little.</p></li>
+    <li><b>A fair race</b><p>Every system got the same traffic and the same accidents, and every AI got the same amount of practice. The central AI gets 12 times fewer examples per decision, so we also gave it 4 times more practice to check whether that was the only problem. It was not.</p></li>
+    <li><b>One learning method can't run the central AI</b><p>DQN would have to compare about 16.8 million combinations of the 12 lights every 5 seconds. So DQN was tested only on the independent and neighbour AIs.</p></li>
+    <li><b>Bugs in the simulator</b><p>The "fixed timer" was secretly a sensor timer; speeding cars crashed into each other because their safety gap was too small; training workers overwrote each other's files; crashed cars counted as waiting; the ambulance siren feature crashed the simulator. All fixed and tested before training.</p></li>
+    <li><b>Found in the results</b><p>Cars stood 5–7 minutes at Zhangeldin × Beibitshilik even on green: the map data made the main street give way to a small side road just after the light. Cars stuck behind a broken-down car also counted as waiting for a green. Both fixed, then everything was tested again.</p></li>
   </ul></section>`;
 }
 
@@ -651,13 +696,13 @@ const replay = {
     $("#season").addEventListener("change", profiles);
     $$("#slots select").forEach((s, i) => { s.value = (o.replay_controllers || [])[i] || ""; s.disabled = true; });
     $("#shield").disabled = true;
-    $("#shield").title = "Recorded with the safety shield on. Run the project locally to switch it off.";
+    $("#shield").title = "These races were recorded with the safety rules on. To switch them off, run the project on your own computer.";
     const hints = $$(".block-head .hint");
-    if (hints[0]) hints[0].textContent = "recorded: best run of each strategy";
-    if (hints[1]) hints[1].textContent = "scripted in the recording";
-    $("#scenarioLine").innerHTML = `Recorded races, ${o.replay_minutes} minutes each. Pick a season and a time of day, then press Run.`;
+    if (hints[0]) hints[0].textContent = "recorded: the best version of each AI";
+    if (hints[1]) hints[1].textContent = "already planned in the recording";
+    $("#scenarioLine").innerHTML = `These are recorded races, ${o.replay_minutes} minutes each. Choose a season and a time of day, then press Start.`;
     const empty = $(".log-empty");
-    if (empty) empty.textContent = "An accident, a person running across, an ambulance, an impaired driver and a breakdown are thrown in at fixed minutes; the season's own events appear too.";
+    if (empty) empty.textContent = "An accident, a person running across, an ambulance, a drunk driver and a broken-down car happen at set minutes, plus the season's own surprises.";
   },
   async handle(m) {
     if (m.cmd === "start") {
@@ -682,7 +727,7 @@ const replay = {
     } else if (m.cmd === "select" && this.data && this.i > 0) {
       onMessage(this.frame(this.i - 1));
     } else if (m.cmd === "event") {
-      toast("This hosted copy plays recorded races. Run the project locally to throw your own events.");
+      toast("This online copy plays recorded races. To cause your own problems, run the project on your own computer.");
     }
   },
   tick() {

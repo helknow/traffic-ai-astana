@@ -16,10 +16,12 @@ from pathlib import Path
 import numpy as np
 
 RES = Path(__file__).resolve().parent / "results"
-LABEL = {"independent": "Independent agents", "central": "Central brain with sub-agents",
-         "neighbour": "Neighbour-aware agents", "fixed": "Fixed timer (today)", "actuated": "Actuated (SUMO)",
-         "max_pressure": "Max-pressure (classic)"}
+# plain names, the same as on the web page
+LABEL = {"independent": "Independent AI", "central": "Central AI", "neighbour": "Neighbour AI",
+         "fixed": "Fixed timer (today)", "actuated": "Sensor timer", "max_pressure": "Simple rule (max-pressure)"}
 ALGO = {"ppo": "PPO", "a2c": "A2C", "dqn": "DQN"}
+WHAT = {"independent": "each light decides alone", "central": "one brain runs all 12 lights",
+        "neighbour": "each light also hears its neighbours"}
 KEYS = ["time_loss_s", "avg_wait_s", "avg_travel_s", "avg_queue", "throughput_vph", "arrived", "teleports",
         "backlog_end", "max_red_wait_s", "ped_loss_s", "co2_kg", "ambulance_s"]
 
@@ -30,9 +32,9 @@ def label(c: str) -> str:
     parts = c.split("_")
     s = LABEL[parts[0]] + f" · {ALGO[parts[1]]}"
     if "noshield" in parts:
-        s += " · shield off"
+        s += " · safety rules off"
     if "long" in parts:
-        s += " · 4× training"
+        s += " · 4× practice"
     return s
 
 
@@ -77,56 +79,59 @@ def analyse() -> dict:
     def vs_fixed(c, k="time_loss_s"):
         return round(100 * (ov[c][k] - fixed[k]) / fixed[k], 1) if fixed and fixed[k] else None
 
+    # the written answer, in plain words (shown on the Results page)
     verdict = []
     if strategies:
         order = sorted(strategies, key=lambda s: ov[strategies[s]["best"]]["time_loss_s"])
         top, top_c = order[0], strategies[order[0]]["best"]
-        verdict.append(f"Best strategy: {LABEL[top]} ({label(top_c)}): {ov[top_c]['time_loss_s']:.0f} s lost per "
-                       f"vehicle on average, {vs_fixed(top_c):+.0f}% against today's fixed timers.")
+        best = ov[top_c]["time_loss_s"]
+        verdict.append(f"Winner: {LABEL[top]} ({WHAT[top]}). With it, a car loses {best:.0f} seconds on average, "
+                       f"{-vs_fixed(top_c):.0f}% less than with today's fixed timers.")
         for s in order[1:]:
             c = strategies[s]["best"]
-            gap = 100 * (ov[c]["time_loss_s"] - ov[top_c]["time_loss_s"]) / ov[top_c]["time_loss_s"]
-            verdict.append(f"{LABEL[s]} ({label(c)}): {ov[c]['time_loss_s']:.0f} s, {gap:+.0f}% vs the best "
-                           f"strategy, {vs_fixed(c):+.0f}% vs fixed timers.")
-        if "independent" in strategies and "central" in strategies:
-            ci, cc = strategies["independent"]["best"], strategies["central"]["best"]
-            k = h2h.get("central|independent")
-            if k:
-                verdict.append(f"Your two strategies head to head: central wins {k['a_wins']} of {len(cells)} "
-                               f"scenarios, independent wins {k['b_wins']}.")
+            loss = ov[c]["time_loss_s"]
+            gap = 100 * (loss - best) / best
+            how = "about the same as the winner" if gap < 3 else f"{gap:.0f}% more delay than the winner"
+            verdict.append(f"{LABEL[s]} ({WHAT[s]}): {loss:.0f} seconds, {how}, "
+                           f"{-vs_fixed(c):.0f}% less than today.")
+        k = h2h.get("central|independent")
+        if k:
+            verdict.append(f"Your two ideas side by side: the independent AI had less delay in {k['b_wins']} of "
+                           f"{len(cells)} situations (4 seasons × 4 times of day), the central AI in {k['a_wins']}.")
         k = h2h.get("independent|neighbour")
         if k:
-            verdict.append(f"Independent vs neighbour-aware: independent wins {k['a_wins']} of {len(cells)} scenarios, "
-                           f"neighbour-aware {k['b_wins']}. Hearing the neighbours adds little on average here.")
+            verdict.append(f"Independent vs neighbour AI: {k['a_wins']} wins to {k['b_wins']}. Letting the lights hear "
+                           f"their neighbours barely helps on these 12 lights.")
         mp_ = ov.get("max_pressure")
         if mp_:
             m = mp_["time_loss_s"]
             loss = {s: ov[strategies[s]["best"]]["time_loss_s"] for s in strategies}
             beat = [s for s in strategies if loss[s] < 0.98 * m]          # within 2 % is a tie
             tie = [s for s in strategies if abs(loss[s] - m) <= 0.02 * m]
-            text = (", ".join(LABEL[s] for s in beat) + " clearly beat it." if beat else
-                    "no RL strategy clearly beats it yet on this budget.")
+            text = (" and ".join(LABEL[s] for s in beat) + " clearly beat it." if beat else
+                    "no AI clearly beats it yet.")
             if tie:
-                text += " " + ", ".join(f"{LABEL[s]} only ties it ({loss[s]:.0f} s vs {m:.0f} s)" for s in tie) + "."
-            verdict.append("Against the best classic rule (max-pressure, no learning): " + text)
+                text += " " + " and ".join(f"{LABEL[s]} only ties it ({loss[s]:.0f} s vs {m:.0f} s)" for s in tie) + "."
+            verdict.append("Compared with the simple rule that needs no AI (green to the longest queue): " + text)
         if "central_ppo_long" in ov and "central_ppo" in ov:
             a, b = ov["central_ppo"]["time_loss_s"], ov["central_ppo_long"]["time_loss_s"]
-            best = ov[top_c]["time_loss_s"]
-            verdict.append(f"Does the central brain only need more data? With 4× the training it loses {b:.0f} s "
-                           f"instead of {a:.0f} s ({100 * (b - a) / a:+.0f}%), still {100 * (b - best) / best:+.0f}% "
-                           f"behind the best strategy: the limit is the design (one model choosing 4^12 joint "
-                           f"actions from one shared reward), not the amount of data.")
+            change = "no better" if b >= a * 0.98 else f"{100 * (a - b) / a:.0f}% better"
+            verdict.append(f"Would more practice save the central AI? With 4 times more training it got {b:.0f} s "
+                           f"instead of {a:.0f} s: {change}. The problem is the design, not practice: one brain has "
+                           f"to pick settings for all 12 lights at once (about 16.8 million combinations) from one "
+                           f"shared score, so it cannot tell which light did well.")
         for s, v in shield.items():
             on, off = v["on"], v["off"]
-            verdict.append(f"Safety shield, {LABEL[s].lower()}: switched off, time lost goes {on['time_loss_s']:.0f} → "
-                           f"{off['time_loss_s']:.0f} s, longest standstill {on['max_red_wait_s']:.0f} → "
-                           f"{off['max_red_wait_s']:.0f} s, teleports {on['teleports']:.1f} → {off['teleports']:.1f}.")
+            verdict.append(f"Safety rules off for the {LABEL[s].lower().replace('ai', 'AI')}: delay per car "
+                           f"{on['time_loss_s']:.0f} → {off['time_loss_s']:.0f} s, longest wait "
+                           f"{on['max_red_wait_s']:.0f} → {off['max_red_wait_s']:.0f} s, stuck cars removed "
+                           f"{on['teleports']:.1f} → {off['teleports']:.1f} per hour.")
         algos = []
         for s, v in strategies.items():
             ranked = sorted(v["runs"], key=lambda c: v["runs"][c]["time_loss_s"])
-            algos.append(f"{LABEL[s].split(' ')[0].lower()}: " + " < ".join(
+            algos.append(f"{LABEL[s]}: " + ", ".join(
                 f"{ALGO[c.split('_')[1]]} {v['runs'][c]['time_loss_s']:.0f} s" for c in ranked))
-        verdict.append("Algorithms (time lost, lower is better): " + "; ".join(algos) + ".")
+        verdict.append("Best learning method (delay per car, lower is better): " + "; ".join(algos) + ".")
     out = {"labels": {c: label(c) for c in ctrls}, "overall": ov, "ranking": ranking, "strategies": strategies,
            "head_to_head": h2h, "per_season": per_season, "shield": shield, "verdict": verdict,
            "vs_fixed": {c: vs_fixed(c) for c in ctrls}, "training": training_info()}

@@ -1,20 +1,20 @@
 {
  "labels": {
   "fixed": "Fixed timer (today)",
-  "actuated": "Actuated (SUMO)",
-  "max_pressure": "Max-pressure (classic)",
-  "central_a2c": "Central brain with sub-agents · A2C",
-  "central_ppo": "Central brain with sub-agents · PPO",
-  "central_ppo_long": "Central brain with sub-agents · PPO · 4× training",
-  "central_ppo_noshield": "Central brain with sub-agents · PPO · shield off",
-  "independent_a2c": "Independent agents · A2C",
-  "independent_dqn": "Independent agents · DQN",
-  "independent_ppo": "Independent agents · PPO",
-  "independent_ppo_noshield": "Independent agents · PPO · shield off",
-  "neighbour_a2c": "Neighbour-aware agents · A2C",
-  "neighbour_dqn": "Neighbour-aware agents · DQN",
-  "neighbour_ppo": "Neighbour-aware agents · PPO",
-  "neighbour_ppo_noshield": "Neighbour-aware agents · PPO · shield off"
+  "actuated": "Sensor timer",
+  "max_pressure": "Simple rule (max-pressure)",
+  "central_a2c": "Central AI · A2C",
+  "central_ppo": "Central AI · PPO",
+  "central_ppo_long": "Central AI · PPO · 4× practice",
+  "central_ppo_noshield": "Central AI · PPO · safety rules off",
+  "independent_a2c": "Independent AI · A2C",
+  "independent_dqn": "Independent AI · DQN",
+  "independent_ppo": "Independent AI · PPO",
+  "independent_ppo_noshield": "Independent AI · PPO · safety rules off",
+  "neighbour_a2c": "Neighbour AI · A2C",
+  "neighbour_dqn": "Neighbour AI · DQN",
+  "neighbour_ppo": "Neighbour AI · PPO",
+  "neighbour_ppo_noshield": "Neighbour AI · PPO · safety rules off"
  },
  "overall": {
   "fixed": {
@@ -557,17 +557,17 @@
   }
  },
  "verdict": [
-  "Best strategy: Independent agents (Independent agents · PPO): 109 s lost per vehicle on average, -52% against today's fixed timers.",
-  "Neighbour-aware agents (Neighbour-aware agents · PPO): 110 s, +1% vs the best strategy, -52% vs fixed timers.",
-  "Central brain with sub-agents (Central brain with sub-agents · PPO): 137 s, +26% vs the best strategy, -40% vs fixed timers.",
-  "Your two strategies head to head: central wins 0 of 16 scenarios, independent wins 16.",
-  "Independent vs neighbour-aware: independent wins 11 of 16 scenarios, neighbour-aware 5. Hearing the neighbours adds little on average here.",
-  "Against the best classic rule (max-pressure, no learning): Independent agents, Neighbour-aware agents clearly beat it. Central brain with sub-agents only ties it (137 s vs 138 s).",
-  "Does the central brain only need more data? With 4× the training it loses 140 s instead of 137 s (+2%), still +28% behind the best strategy: the limit is the design (one model choosing 4^12 joint actions from one shared reward), not the amount of data.",
-  "Safety shield, independent agents: switched off, time lost goes 109 → 106 s, longest standstill 188 → 285 s, teleports 0.7 → 0.7.",
-  "Safety shield, central brain with sub-agents: switched off, time lost goes 137 → 718 s, longest standstill 230 → 1283 s, teleports 0.4 → 104.0.",
-  "Safety shield, neighbour-aware agents: switched off, time lost goes 110 → 106 s, longest standstill 184 → 330 s, teleports 0.1 → 0.2.",
-  "Algorithms (time lost, lower is better): independent: PPO 109 s < A2C 112 s < DQN 118 s; central: PPO 137 s < A2C 180 s; neighbour-aware: PPO 110 s < DQN 115 s < A2C 124 s."
+  "Winner: Independent AI (each light decides alone). With it, a car loses 109 seconds on average, 52% less than with today's fixed timers.",
+  "Neighbour AI (each light also hears its neighbours): 110 seconds, about the same as the winner, 52% less than today.",
+  "Central AI (one brain runs all 12 lights): 137 seconds, 26% more delay than the winner, 40% less than today.",
+  "Your two ideas side by side: the independent AI had less delay in 16 of 16 situations (4 seasons × 4 times of day), the central AI in 0.",
+  "Independent vs neighbour AI: 11 wins to 5. Letting the lights hear their neighbours barely helps on these 12 lights.",
+  "Compared with the simple rule that needs no AI (green to the longest queue): Independent AI and Neighbour AI clearly beat it. Central AI only ties it (137 s vs 138 s).",
+  "Would more practice save the central AI? With 4 times more training it got 140 s instead of 137 s: no better. The problem is the design, not practice: one brain has to pick settings for all 12 lights at once (about 16.8 million combinations) from one shared score, so it cannot tell which light did well.",
+  "Safety rules off for the independent AI: delay per car 109 → 106 s, longest wait 188 → 285 s, stuck cars removed 0.7 → 0.7 per hour.",
+  "Safety rules off for the central AI: delay per car 137 → 718 s, longest wait 230 → 1283 s, stuck cars removed 0.4 → 104.0 per hour.",
+  "Safety rules off for the neighbour AI: delay per car 110 → 106 s, longest wait 184 → 330 s, stuck cars removed 0.1 → 0.2 per hour.",
+  "Best learning method (delay per car, lower is better): Independent AI: PPO 109 s, A2C 112 s, DQN 118 s; Central AI: PPO 137 s, A2C 180 s; Neighbour AI: PPO 110 s, DQN 115 s, A2C 124 s."
  ],
  "vs_fixed": {
   "fixed": 0.0,
