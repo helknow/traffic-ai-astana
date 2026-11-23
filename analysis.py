@@ -112,10 +112,14 @@ def analyse() -> dict:
                     "no AI clearly beats it yet.")
             if tie:
                 text += " " + " and ".join(f"{LABEL[s]} only ties it ({loss[s]:.0f} s vs {m:.0f} s)" for s in tie) + "."
+            worse = [s for s in strategies if loss[s] > 1.02 * m]
+            if worse:
+                text += " " + " and ".join(f"{LABEL[s]} does worse than it ({loss[s]:.0f} s vs {m:.0f} s)" for s in worse) + "."
             verdict.append("Compared with the simple rule that needs no AI (green to the longest queue): " + text)
         if "central_ppo_long" in ov and "central_ppo" in ov:
             a, b = ov["central_ppo"]["time_loss_s"], ov["central_ppo_long"]["time_loss_s"]
-            change = "no better" if b >= a * 0.98 else f"{100 * (a - b) / a:.0f}% better"
+            change = (f"{100 * (b - a) / a:.0f}% worse" if b > a * 1.02 else
+                      "no better" if b >= a * 0.98 else f"{100 * (a - b) / a:.0f}% better")
             verdict.append(f"Would more practice save the central AI? With 4 times more training it got {b:.0f} s "
                            f"instead of {a:.0f} s: {change}. The problem is the design, not practice: one brain has "
                            f"to pick settings for all 12 lights at once (about 16.8 million combinations) from one "

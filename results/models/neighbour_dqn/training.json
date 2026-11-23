@@ -5,182 +5,182 @@
  "tag": "",
  "sim_hours": 400.0,
  "timesteps": 3456000,
- "minutes": 20.9,
+ "minutes": 19.5,
  "history": [
   {
    "sim_hours": 16,
-   "minutes": 0.9,
-   "avg_queue": 66.6,
-   "throughput_vph": 2689.0,
-   "max_red_wait_s": 187.0
+   "minutes": 0.8,
+   "avg_queue": 69.8,
+   "throughput_vph": 2680.0,
+   "max_red_wait_s": 201.0
   },
   {
    "sim_hours": 32,
-   "minutes": 1.8,
-   "avg_queue": 51.5,
-   "throughput_vph": 2550.0,
-   "max_red_wait_s": 262.0
+   "minutes": 1.6,
+   "avg_queue": 53.6,
+   "throughput_vph": 2572.0,
+   "max_red_wait_s": 242.0
   },
   {
    "sim_hours": 48,
-   "minutes": 2.6,
-   "avg_queue": 46.9,
-   "throughput_vph": 2747.0,
-   "max_red_wait_s": 220.0
+   "minutes": 2.4,
+   "avg_queue": 47.5,
+   "throughput_vph": 2774.0,
+   "max_red_wait_s": 174.0
   },
   {
    "sim_hours": 64,
-   "minutes": 3.4,
+   "minutes": 3.2,
    "avg_queue": 42.1,
-   "throughput_vph": 2780.0,
-   "max_red_wait_s": 198.0
+   "throughput_vph": 2801.0,
+   "max_red_wait_s": 152.0
   },
   {
    "sim_hours": 80,
-   "minutes": 4.3,
-   "avg_queue": 46.8,
-   "throughput_vph": 2846.0,
-   "max_red_wait_s": 217.0
-  },
-  {
-   "sim_hours": 96,
-   "minutes": 5.2,
-   "avg_queue": 41.8,
-   "throughput_vph": 2718.0,
-   "max_red_wait_s": 223.0
-  },
-  {
-   "sim_hours": 112,
-   "minutes": 5.9,
-   "avg_queue": 32.7,
-   "throughput_vph": 2446.0,
-   "max_red_wait_s": 243.0
-  },
-  {
-   "sim_hours": 128,
-   "minutes": 6.8,
-   "avg_queue": 37.8,
-   "throughput_vph": 2646.0,
-   "max_red_wait_s": 157.0
-  },
-  {
-   "sim_hours": 144,
-   "minutes": 7.6,
-   "avg_queue": 38.0,
-   "throughput_vph": 2716.0,
-   "max_red_wait_s": 197.0
-  },
-  {
-   "sim_hours": 160,
-   "minutes": 8.4,
-   "avg_queue": 36.5,
-   "throughput_vph": 2558.0,
-   "max_red_wait_s": 224.0
-  },
-  {
-   "sim_hours": 176,
-   "minutes": 9.2,
-   "avg_queue": 41.0,
-   "throughput_vph": 2803.0,
-   "max_red_wait_s": 277.0
-  },
-  {
-   "sim_hours": 192,
-   "minutes": 10.0,
-   "avg_queue": 35.5,
-   "throughput_vph": 2716.0,
-   "max_red_wait_s": 213.0
-  },
-  {
-   "sim_hours": 208,
-   "minutes": 10.9,
-   "avg_queue": 36.3,
-   "throughput_vph": 2741.0,
-   "max_red_wait_s": 198.0
-  },
-  {
-   "sim_hours": 224,
-   "minutes": 11.7,
-   "avg_queue": 37.9,
-   "throughput_vph": 2691.0,
+   "minutes": 4.0,
+   "avg_queue": 46.7,
+   "throughput_vph": 2881.0,
    "max_red_wait_s": 188.0
   },
   {
+   "sim_hours": 96,
+   "minutes": 4.8,
+   "avg_queue": 41.6,
+   "throughput_vph": 2782.0,
+   "max_red_wait_s": 194.0
+  },
+  {
+   "sim_hours": 112,
+   "minutes": 5.6,
+   "avg_queue": 32.8,
+   "throughput_vph": 2501.0,
+   "max_red_wait_s": 177.0
+  },
+  {
+   "sim_hours": 128,
+   "minutes": 6.4,
+   "avg_queue": 38.9,
+   "throughput_vph": 2675.0,
+   "max_red_wait_s": 145.0
+  },
+  {
+   "sim_hours": 144,
+   "minutes": 7.1,
+   "avg_queue": 35.1,
+   "throughput_vph": 2766.0,
+   "max_red_wait_s": 150.0
+  },
+  {
+   "sim_hours": 160,
+   "minutes": 7.9,
+   "avg_queue": 36.7,
+   "throughput_vph": 2581.0,
+   "max_red_wait_s": 158.0
+  },
+  {
+   "sim_hours": 176,
+   "minutes": 8.7,
+   "avg_queue": 41.8,
+   "throughput_vph": 2820.0,
+   "max_red_wait_s": 208.0
+  },
+  {
+   "sim_hours": 192,
+   "minutes": 9.4,
+   "avg_queue": 35.9,
+   "throughput_vph": 2727.0,
+   "max_red_wait_s": 209.0
+  },
+  {
+   "sim_hours": 208,
+   "minutes": 10.2,
+   "avg_queue": 36.2,
+   "throughput_vph": 2758.0,
+   "max_red_wait_s": 182.0
+  },
+  {
+   "sim_hours": 224,
+   "minutes": 11.0,
+   "avg_queue": 39.3,
+   "throughput_vph": 2691.0,
+   "max_red_wait_s": 146.0
+  },
+  {
    "sim_hours": 240,
-   "minutes": 12.5,
-   "avg_queue": 36.4,
-   "throughput_vph": 2403.0,
-   "max_red_wait_s": 195.0
+   "minutes": 11.7,
+   "avg_queue": 34.8,
+   "throughput_vph": 2445.0,
+   "max_red_wait_s": 155.0
   },
   {
    "sim_hours": 256,
-   "minutes": 13.3,
-   "avg_queue": 32.7,
-   "throughput_vph": 2609.0,
-   "max_red_wait_s": 175.0
+   "minutes": 12.5,
+   "avg_queue": 33.1,
+   "throughput_vph": 2601.0,
+   "max_red_wait_s": 164.0
   },
   {
    "sim_hours": 272,
-   "minutes": 14.1,
-   "avg_queue": 37.2,
-   "throughput_vph": 2543.0,
-   "max_red_wait_s": 179.0
+   "minutes": 13.2,
+   "avg_queue": 37.5,
+   "throughput_vph": 2548.0,
+   "max_red_wait_s": 156.0
   },
   {
    "sim_hours": 288,
-   "minutes": 14.9,
-   "avg_queue": 33.6,
-   "throughput_vph": 2530.0,
-   "max_red_wait_s": 180.0
+   "minutes": 14.0,
+   "avg_queue": 34.6,
+   "throughput_vph": 2520.0,
+   "max_red_wait_s": 177.0
   },
   {
    "sim_hours": 304,
-   "minutes": 15.7,
-   "avg_queue": 39.6,
-   "throughput_vph": 2756.0,
-   "max_red_wait_s": 223.0
+   "minutes": 14.8,
+   "avg_queue": 39.3,
+   "throughput_vph": 2744.0,
+   "max_red_wait_s": 208.0
   },
   {
    "sim_hours": 320,
-   "minutes": 16.5,
-   "avg_queue": 36.9,
-   "throughput_vph": 2664.0,
-   "max_red_wait_s": 227.0
+   "minutes": 15.6,
+   "avg_queue": 36.6,
+   "throughput_vph": 2682.0,
+   "max_red_wait_s": 188.0
   },
   {
    "sim_hours": 336,
-   "minutes": 17.4,
-   "avg_queue": 39.2,
-   "throughput_vph": 2662.0,
-   "max_red_wait_s": 228.0
+   "minutes": 16.3,
+   "avg_queue": 37.3,
+   "throughput_vph": 2689.0,
+   "max_red_wait_s": 165.0
   },
   {
    "sim_hours": 352,
-   "minutes": 18.3,
-   "avg_queue": 43.2,
-   "throughput_vph": 2771.0,
-   "max_red_wait_s": 243.0
+   "minutes": 17.1,
+   "avg_queue": 41.0,
+   "throughput_vph": 2839.0,
+   "max_red_wait_s": 147.0
   },
   {
    "sim_hours": 368,
-   "minutes": 19.1,
-   "avg_queue": 42.1,
-   "throughput_vph": 2789.0,
-   "max_red_wait_s": 235.0
+   "minutes": 17.9,
+   "avg_queue": 44.4,
+   "throughput_vph": 2802.0,
+   "max_red_wait_s": 213.0
   },
   {
    "sim_hours": 384,
-   "minutes": 20.0,
+   "minutes": 18.7,
    "avg_queue": 35.2,
-   "throughput_vph": 2558.0,
-   "max_red_wait_s": 220.0
+   "throughput_vph": 2572.0,
+   "max_red_wait_s": 196.0
   },
   {
    "sim_hours": 400,
-   "minutes": 20.9,
-   "avg_queue": 47.0,
-   "throughput_vph": 2989.0,
-   "max_red_wait_s": 218.0
+   "minutes": 19.5,
+   "avg_queue": 46.9,
+   "throughput_vph": 3040.0,
+   "max_red_wait_s": 153.0
   }
  ],
  "worker_restarts": 0

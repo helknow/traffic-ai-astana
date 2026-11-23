@@ -677,7 +677,7 @@ function fixesCard() {
     <li><b>A fair race</b><p>Every system got the same traffic and the same accidents, and every AI got the same amount of practice. The central AI gets 12 times fewer examples per decision, so we also gave it 4 times more practice to check whether that was the only problem. It was not.</p></li>
     <li><b>One learning method can't run the central AI</b><p>DQN would have to compare about 16.8 million combinations of the 12 lights every 5 seconds. So DQN was tested only on the independent and neighbour AIs.</p></li>
     <li><b>Bugs in the simulator</b><p>The "fixed timer" was secretly a sensor timer; speeding cars crashed into each other because their safety gap was too small; training workers overwrote each other's files; crashed cars counted as waiting; the ambulance siren feature crashed the simulator. All fixed and tested before training.</p></li>
-    <li><b>Found in the results</b><p>Cars stood 5–7 minutes at Zhangeldin × Beibitshilik even on green: the map data made the main street give way to a small side road just after the light. Cars stuck behind a broken-down car also counted as waiting for a green. Both fixed, then everything was tested again.</p></li>
+    <li><b>Found in the results</b><p>Cars stood 5–7 minutes at Zhangeldin × Beibitshilik even on green: the map data made the main street give way to a small side road just after the light. Cars stuck behind a broken-down car also counted as waiting for a green. Both fixed, then every AI was trained again from zero on the fixed map and tested again.</p></li>
   </ul></section>`;
 }
 
